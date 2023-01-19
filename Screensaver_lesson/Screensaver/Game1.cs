@@ -15,6 +15,10 @@ namespace Screensaver
         private Vector2 snoopyDirection = new Vector2();
         private Rectangle snoopyRectangle = new Rectangle();
 
+        private Texture2D capybaraTexture;
+        private Vector2 capybaraDirection = new Vector2();
+        private Rectangle capybarayRectangle = new Rectangle();
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -26,8 +30,10 @@ namespace Screensaver
         {
             // TODO: Add your initialization logic here
             snoopyDirection = new Vector2(5f, 5f);
+            capybaraDirection = new Vector2(5f, 5f);
             base.Initialize();
             snoopyRectangle = snoopyTexture.Bounds;
+            capybarayRectangle = capybaraTexture.Bounds;
         }
 
         protected override void LoadContent()
@@ -37,6 +43,7 @@ namespace Screensaver
             // TODO: use this.Content to load your game content here
             backgroundTexture = Content.Load<Texture2D>("snoopy_bg1");
             snoopyTexture = Content.Load<Texture2D>("snoopy3");
+            capybaraTexture = Content.Load<Texture2D>("rsz_1capybara");
         }
 
         protected override void Update(GameTime gameTime)
@@ -58,6 +65,16 @@ namespace Screensaver
                 snoopyRectangle.Offset(snoopyDirection);
             }
 
+            if (capybarayRectangle.Bottom > _graphics.PreferredBackBufferHeight || capybarayRectangle.Top < 0)
+            {
+                capybaraDirection.Y *= -1;
+            }
+            if (capybarayRectangle.Right > _graphics.PreferredBackBufferWidth || capybarayRectangle.Left < 0)
+            {
+                capybaraDirection.X *= -1;
+            }
+            capybarayRectangle.Offset(capybaraDirection);
+
             base.Update(gameTime);
         }
 
@@ -70,6 +87,7 @@ namespace Screensaver
             _spriteBatch.Begin();
             _spriteBatch.Draw(backgroundTexture, new Rectangle(0, 0, 800, 480), Color.White);
             _spriteBatch.Draw(snoopyTexture, snoopyRectangle.Location.ToVector2(),Color.White);
+            _spriteBatch.Draw(capybaraTexture, capybarayRectangle.Location.ToVector2(), Color.White);
             //_spriteBatch.Draw(snoopyTexture, new Rectangle((int)snoopyRectangle.Location.ToVector2().X,(int)snoopyRectangle.Location.ToVector2().Y,0,0 ), Color.White);
             _spriteBatch.End();
             base.Draw(gameTime);

@@ -70,6 +70,7 @@ namespace Screensaver
             _spriteBatch.Begin();
             _spriteBatch.Draw(backgroundTexture, new Rectangle(0, 0, 800, 480), Color.White);
             _spriteBatch.Draw(snoopyTexture, snoopyRectangle.Location.ToVector2(),Color.White);
+            //_spriteBatch.Draw(snoopyTexture, new Rectangle((int)snoopyRectangle.Location.ToVector2().X,(int)snoopyRectangle.Location.ToVector2().Y,0,0 ), Color.White);
             _spriteBatch.End();
             base.Draw(gameTime);
         }

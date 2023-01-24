@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data.Common;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -53,8 +55,40 @@ namespace Lesson05_Animations
 
                     // Advance the frame index looping as appropriate...
                     celIndex = (celIndex + 1) % celAnimationSequence.CelCount;
+                    Debug.WriteLine(celIndex + "=" + celAnimationSequence.CelCount);
 
                     celSourceRectangle.X = celIndex * celSourceRectangle.Width;
+
+                    Debug.WriteLine(celSourceRectangle.X);
+
+
+                    //int column = celIndex % celAnimationSequence.CelCount;
+                    //int row = celIndex / celAnimationSequence.CelCount;
+
+                    //celSourceRectangle = new Rectangle(celIndex * celSourceRectangle.Width, 2 * celSourceRectangle.Height, celSourceRectangle.Width, celSourceRectangle.Height);
+
+                    //const int rowCount = 2;
+                    //const int columnCount = 3;
+                    //const int spriteCount = 5;
+                    //int row = 0;
+                    //int column = 0;
+                    //for (int i = 0; i < spriteCount; ++i)
+                    //{
+                    //    row = i / columnCount;
+                    //    column = i % columnCount;
+
+                    //    int width = celAnimationSequence.Texture.Width / columnCount;
+                    //    int height = celAnimationSequence.Texture.Height / rowCount;
+
+                    //    Debug.WriteLine(width + "-" + height);
+                    //    celSourceRectangle = new Rectangle(column * width, row * height, width, height);
+                    //}
+
+                    //Debug.WriteLine(row + "-" + column);
+                    //int width = celAnimationSequence.Texture.Width / columnCount;
+                    //int height = celAnimationSequence.Texture.Height / rowCount;
+                    //Debug.WriteLine(width + "-" + height);
+                    //celSourceRectangle = new Rectangle(column * width, row * height, width, height);
                 }
             }
         }

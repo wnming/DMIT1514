@@ -66,10 +66,10 @@ namespace Lab1_Napat_Phuwarintarawanich
                 Exit();
 
             // TODO: Add your update logic here
-            otterDirection.Y = 0;
 
             if (Keyboard.GetState().IsKeyDown(Keys.Right))
             {
+                otterDirection.Y = 0;
                 otterDirection.X++;
                 if (otterRectangle.Right >= _graphics.PreferredBackBufferWidth)
                 {
@@ -80,6 +80,7 @@ namespace Lab1_Napat_Phuwarintarawanich
 
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
             {
+                otterDirection.Y = 0;
                 otterDirection.X--;
                 if (otterRectangle.Left <= 0)
                 {
@@ -87,6 +88,29 @@ namespace Lab1_Napat_Phuwarintarawanich
                 }
                 otterRectangle.Offset(otterDirection);
             }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+                otterDirection.X = 0;
+                otterDirection.Y--;
+                if (otterRectangle.Top <= 0)
+                {
+                    otterDirection.Y = 0;
+                }
+                otterRectangle.Offset(otterDirection);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            {
+                otterDirection.X = 0;
+                otterDirection.Y++;
+                if (otterRectangle.Bottom >= _graphics.PreferredBackBufferHeight)
+                {
+                    otterDirection.Y = 0;
+                }
+                otterRectangle.Offset(otterDirection);
+            }
+
 
             //if (Keyboard.GetState().IsKeyDown(Keys.Right))
             //{

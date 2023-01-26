@@ -1,4 +1,7 @@
-﻿using Lesson05_Animations;
+﻿using System;
+using System.Data.Common;
+using System.Diagnostics;
+using Lesson05_Animations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -19,11 +22,16 @@ namespace Lab1_Napat_Phuwarintarawanich
         CelAnimationSequence otterRunning;
         CelAnimationPlayer animationPlayer;
 
+        private Texture2D otterTexture;
+        private Vector2 otterDirection = new Vector2();
+        private Vector2 otterSpeed = new Vector2(1, 1);
+        private Rectangle otterRectangle = new Rectangle();
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             _graphics.PreferredBackBufferHeight = WindowHeight;
-            _graphics.PreferredBackBufferHeight = WindowHeight;
+            _graphics.PreferredBackBufferWidth = WindowWidth;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -31,8 +39,9 @@ namespace Lab1_Napat_Phuwarintarawanich
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            otterDirection = new Vector2(0, 0);
             base.Initialize();
+            otterRectangle = otterTexture.Bounds;
         }
 
         protected override void LoadContent()
@@ -41,7 +50,8 @@ namespace Lab1_Napat_Phuwarintarawanich
 
             // TODO: use this.Content to load your game content here
             bgTexture = Content.Load<Texture2D>("zoo_background");
-            fgTexture = Content.Load<Texture2D>("otter_foreground");
+            fgTexture = Content.Load<Texture2D>("otter_sleeping");
+            otterTexture = Content.Load<Texture2D>("otter_idle");
 
             Texture2D spriteSheet = Content.Load<Texture2D>("otter_running");
             otterRunning = new CelAnimationSequence(spriteSheet, 200, 1 / 8.0f);
@@ -56,8 +66,51 @@ namespace Lab1_Napat_Phuwarintarawanich
                 Exit();
 
             // TODO: Add your update logic here
-            animationPlayer.Update(gameTime);
+            otterDirection.Y = 0;
 
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            {
+                otterDirection.X++;
+                if (otterRectangle.Right >= _graphics.PreferredBackBufferWidth)
+                {
+                    otterDirection.X = 0;
+                }
+                otterRectangle.Offset(otterDirection);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            {
+                otterDirection.X--;
+                if (otterRectangle.Left <= 0)
+                {
+                    otterDirection.X = 0;
+                }
+                otterRectangle.Offset(otterDirection);
+            }
+
+            //if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            //{
+            //    otterDirection.X += 5;
+            //    //otterDirection.Y = 0;
+            //    if (otterR
+            //        . >= _graphics.PreferredBackBufferWidth)
+            //    {
+            //        otterDirection.X = WindowWidth;
+            //    }
+            //    Debug.WriteLine(otterDirection.X);
+            //}
+
+            //if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            //{
+            //    otterDirection.X -= 5;
+            //    //otterDirection.Y = 0;
+            //    if (otterDirection.X <= 0)
+            //    {
+            //        otterDirection.X = 0;
+            //    }
+            //    Debug.WriteLine(otterDirection.X);
+            //}
+            animationPlayer.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -70,6 +123,8 @@ namespace Lab1_Napat_Phuwarintarawanich
             _spriteBatch.Draw(bgTexture, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
             animationPlayer.Draw(_spriteBatch, Vector2.Zero, SpriteEffects.None);
             _spriteBatch.Draw(fgTexture, new Rectangle(400, 260, 200, 200), Color.White);
+            _spriteBatch.Draw(otterTexture, otterRectangle.Location.ToVector2(), Color.White);
+            //_spriteBatch.Draw(otterTexture, otterDirection, Color.White);
             _spriteBatch.End();
             base.Draw(gameTime);
         }

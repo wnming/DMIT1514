@@ -55,12 +55,8 @@ namespace Lesson05_Animations
 
                     // Advance the frame index looping as appropriate...
                     celIndex = (celIndex + 1) % celAnimationSequence.CelCount;
-                    Debug.WriteLine(celIndex + "=" + celAnimationSequence.CelCount);
 
                     celSourceRectangle.X = celIndex * celSourceRectangle.Width;
-
-                    Debug.WriteLine(celSourceRectangle.X);
-
 
                     //int column = celIndex % celAnimationSequence.CelCount;
                     //int row = celIndex / celAnimationSequence.CelCount;

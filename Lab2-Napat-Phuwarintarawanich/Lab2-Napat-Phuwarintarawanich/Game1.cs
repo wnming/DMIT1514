@@ -6,37 +6,71 @@ namespace Lab2_Napat_Phuwarintarawanich
 {
     public class Game1 : Game
     {
-        private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
+
+        Texture2D backgroundImage;
+        Texture2D xImage;
+        Texture2D oImage;
+
+        const int WindowWidth = 601;
+        const int WindowHeight = 601;
+
+        MouseState currentMouseState;
+        MouseState previousMouseState;
+
+        public enum GameSpaceState
+        {
+            Empty,
+            X,
+            O
+        }
+
+        GameSpaceState nextTokenToBePlayed;
 
         public Game1()
         {
-            _graphics = new GraphicsDeviceManager(this);
+            graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
         }
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            graphics.PreferredBackBufferWidth = WindowWidth;
+            graphics.PreferredBackBufferHeight = WindowHeight;
+            graphics.ApplyChanges();
+
+            nextTokenToBePlayed = GameSpaceState.X;
 
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // TODO: use this.Content to load your game content here
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            backgroundImage = Content.Load<Texture2D>("TicTacToeBoard");
+            xImage = Content.Load<Texture2D>("X");
+            oImage = Content.Load<Texture2D>("O");
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            currentMouseState = Mouse.GetState();
 
-            // TODO: Add your update logic here
+            if (previousMouseState.LeftButton == ButtonState.Pressed && currentMouseState.LeftButton == ButtonState.Released)
+            {
+                //there has been a mouse click (mouse release)
+                if (nextTokenToBePlayed == GameSpaceState.X)
+                {
+                    nextTokenToBePlayed = GameSpaceState.O;
+                }
+                else if (nextTokenToBePlayed == GameSpaceState.O)
+                {
+                    nextTokenToBePlayed = GameSpaceState.X;
+                }
+            }
 
+            previousMouseState = currentMouseState;
             base.Update(gameTime);
         }
 
@@ -44,7 +78,24 @@ namespace Lab2_Napat_Phuwarintarawanich
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            Vector2 adjustedMousePosition =
+                new Vector2(currentMouseState.Position.X - (xImage.Width / 2),
+                    currentMouseState.Position.Y - (xImage.Height / 2));
+
+            Texture2D imageToDraw = xImage;
+            if (nextTokenToBePlayed == GameSpaceState.O)
+            {
+                imageToDraw = oImage;
+            }
+            else if (nextTokenToBePlayed == GameSpaceState.X)
+            {
+                imageToDraw = xImage;
+            }
+
+            spriteBatch.Begin();
+            spriteBatch.Draw(backgroundImage, Vector2.Zero, Color.White);
+            spriteBatch.Draw(imageToDraw, adjustedMousePosition, Color.White);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

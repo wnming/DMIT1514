@@ -15,6 +15,7 @@ namespace Lab1_Napat_Phuwarintarawanich
 
         private const int WindowWidth = 850;
         private const int WindowHeight = 611;
+        private const int Speed = 5;
 
         private Texture2D bgTexture;
         private Texture2D fgTexture;
@@ -25,7 +26,7 @@ namespace Lab1_Napat_Phuwarintarawanich
         private Texture2D otterTexture;
         private Vector2 otterDirection = new Vector2();
         private Vector2 otterSpeed = new Vector2(1, 1);
-        private Rectangle otterRectangle = new Rectangle();
+        //private Rectangle otterRectangle = new Rectangle();
 
         public Game1()
         {
@@ -34,14 +35,15 @@ namespace Lab1_Napat_Phuwarintarawanich
             _graphics.PreferredBackBufferWidth = WindowWidth;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            otterDirection = new Vector2(300, 320);
         }
 
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            otterDirection = new Vector2(0, 0);
             base.Initialize();
-            otterRectangle = otterTexture.Bounds;
+            //otterRectangle = otterTexture.Bounds;
         }
 
         protected override void LoadContent()
@@ -69,49 +71,86 @@ namespace Lab1_Napat_Phuwarintarawanich
 
             if (Keyboard.GetState().IsKeyDown(Keys.Right))
             {
-                otterDirection.Y = 0;
-                otterDirection.X++;
-                if (otterRectangle.Right >= _graphics.PreferredBackBufferWidth)
+                //otterDirection.Y = 0;
+                otterDirection.X += Speed;
+                if (otterDirection.X >= _graphics.PreferredBackBufferWidth - otterTexture.Width)
                 {
-                    otterDirection.X = 0;
+                    otterDirection.X = _graphics.PreferredBackBufferWidth - otterTexture.Width;
                 }
-                otterRectangle.Offset(otterDirection);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
             {
-                otterDirection.Y = 0;
-                otterDirection.X--;
-                if (otterRectangle.Left <= 0)
+                otterDirection.X -= Speed;
+                if (otterDirection.X <= 0)
                 {
                     otterDirection.X = 0;
                 }
-                otterRectangle.Offset(otterDirection);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.Up))
             {
-                otterDirection.X = 0;
-                otterDirection.Y--;
-                if (otterRectangle.Top <= 0)
+                otterDirection.Y -= Speed;
+                if (otterDirection.Y <= 0)
                 {
                     otterDirection.Y = 0;
                 }
-                otterRectangle.Offset(otterDirection);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.Down))
             {
-                otterDirection.X = 0;
-                otterDirection.Y++;
-                if (otterRectangle.Bottom >= _graphics.PreferredBackBufferHeight)
+                otterDirection.Y += Speed;
+                if (otterDirection.Y >= _graphics.PreferredBackBufferHeight - otterTexture.Height)
                 {
-                    otterDirection.Y = 0;
+                    otterDirection.Y = _graphics.PreferredBackBufferHeight - otterTexture.Height;
                 }
-                otterRectangle.Offset(otterDirection);
             }
 
+            //if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            //{
+            //    otterDirection.Y = 0;
+            //    otterDirection.X++;
+            //    if (otterRectangle.Right >= _graphics.PreferredBackBufferWidth)
+            //    {
+            //        otterDirection.X = 0;
+            //    }
+            //    otterRectangle.Offset(otterDirection);
+            //}
 
+            //if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            //{
+            //    otterDirection.Y = 0;
+            //    otterDirection.X--;
+            //    if (otterRectangle.Left <= 0)
+            //    {
+            //        otterDirection.X = 0;
+            //    }
+            //    otterRectangle.Offset(otterDirection);
+            //}
+
+            //if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            //{
+            //    otterDirection.X = 0;
+            //    otterDirection.Y--;
+            //    if (otterRectangle.Top <= 0)
+            //    {
+            //        otterDirection.Y = 0;
+            //    }
+            //    otterRectangle.Offset(otterDirection);
+            //}
+
+            //if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            //{
+            //    otterDirection.X = 0;
+            //    otterDirection.Y++;
+            //    if (otterRectangle.Bottom >= _graphics.PreferredBackBufferHeight)
+            //    {
+            //        otterDirection.Y = 0;
+            //    }
+            //    otterRectangle.Offset(otterDirection);
+            //}
+
+            //--not using
             //if (Keyboard.GetState().IsKeyDown(Keys.Right))
             //{
             //    otterDirection.X += 5;
@@ -134,7 +173,7 @@ namespace Lab1_Napat_Phuwarintarawanich
             //    }
             //    Debug.WriteLine(otterDirection.X);
             //}
-            animationPlayer.Update(gameTime);
+            animationPlayer.Update(gameTime, 2);
             base.Update(gameTime);
         }
 
@@ -147,8 +186,9 @@ namespace Lab1_Napat_Phuwarintarawanich
             _spriteBatch.Draw(bgTexture, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
             animationPlayer.Draw(_spriteBatch, Vector2.Zero, SpriteEffects.None);
             _spriteBatch.Draw(fgTexture, new Rectangle(400, 260, 200, 200), Color.White);
-            _spriteBatch.Draw(otterTexture, otterRectangle.Location.ToVector2(), Color.White);
+            //_spriteBatch.Draw(otterTexture, otterRectangle.Location.ToVector2(), Color.White);
             //_spriteBatch.Draw(otterTexture, otterDirection, Color.White);
+            _spriteBatch.Draw(otterTexture, otterDirection, Color.White);
             _spriteBatch.End();
             base.Draw(gameTime);
         }

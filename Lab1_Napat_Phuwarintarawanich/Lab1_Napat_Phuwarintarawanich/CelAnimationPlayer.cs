@@ -16,6 +16,8 @@ namespace Lesson05_Animations
         private float celTimeElapsed;
         private Rectangle celSourceRectangle;
 
+        private int currentCelIndex = 0;
+
         /// <summary>
         /// Begins or continues playback of a CelAnimationSequence.
         /// </summary>
@@ -43,9 +45,8 @@ namespace Lesson05_Animations
         /// Update the state of the CelAnimationPlayer.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        public void Update(GameTime gameTime, int spriteRow)
+        public void Update(GameTime gameTime)
         {
-            celSourceRectangle.Y = celAnimationSequence.CelHeight * spriteRow;
             if (celAnimationSequence != null)
             {
                 celTimeElapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -56,36 +57,23 @@ namespace Lesson05_Animations
 
                     // Advance the frame index looping as appropriate...
                     celIndex = (celIndex + 1) % celAnimationSequence.CelCount;
+                    currentCelIndex = celIndex;
 
-                    celSourceRectangle.X = celIndex * celSourceRectangle.Width;
+                    //if more than 1 row
+                    if(celIndex > celAnimationSequence.CelCount / celAnimationSequence.CelRow)
+                    {
+                        //set celSourceRectangle.Y to Y point of that frame
+                        celSourceRectangle.Y = celSourceRectangle.Width * ((celIndex - 1) / celAnimationSequence.CelRow);
+                        //update  the current celIndex so celSourceRectangle.X will have the correct value
+                        currentCelIndex = (celIndex - celAnimationSequence.CelColumn) % celAnimationSequence.CelCount;
+                    }
+                    else
+                    {
+                        //set Y = 0 for the first row
+                        celSourceRectangle.Y = 0;
+                    }
 
-                    //int column = celIndex % celAnimationSequence.CelCount;
-                    //int row = celIndex / celAnimationSequence.CelCount;
-
-                    //celSourceRectangle = new Rectangle(celIndex * celSourceRectangle.Width, 2 * celSourceRectangle.Height, celSourceRectangle.Width, celSourceRectangle.Height);
-
-                    //const int rowCount = 2;
-                    //const int columnCount = 3;
-                    //const int spriteCount = 5;
-                    //int row = 0;
-                    //int column = 0;
-                    //for (int i = 0; i < spriteCount; ++i)
-                    //{
-                    //    row = i / columnCount;
-                    //    column = i % columnCount;
-
-                    //    int width = celAnimationSequence.Texture.Width / columnCount;
-                    //    int height = celAnimationSequence.Texture.Height / rowCount;
-
-                    //    Debug.WriteLine(width + "-" + height);
-                    //    celSourceRectangle = new Rectangle(column * width, row * height, width, height);
-                    //}
-
-                    //Debug.WriteLine(row + "-" + column);
-                    //int width = celAnimationSequence.Texture.Width / columnCount;
-                    //int height = celAnimationSequence.Texture.Height / rowCount;
-                    //Debug.WriteLine(width + "-" + height);
-                    //celSourceRectangle = new Rectangle(column * width, row * height, width, height);
+                    celSourceRectangle.X = currentCelIndex * celSourceRectangle.Width;
                 }
             }
         }

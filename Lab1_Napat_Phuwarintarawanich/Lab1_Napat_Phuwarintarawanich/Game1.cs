@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
 using Lesson05_Animations;
@@ -15,18 +16,31 @@ namespace Lab1_Napat_Phuwarintarawanich
 
         private const int WindowWidth = 850;
         private const int WindowHeight = 611;
-        private const int Speed = 5;
+        private const int Speed = 20;
+        private const int MaxRigth = 550;
+        private const int MaxLeft = 290;
+        private const int MaxUp = 200;
+        private const int MaxDown = 300;
+        private const int SpriteColumn = 4;
 
+        //background image
         private Texture2D bgTexture;
-        private Texture2D fgTexture;
+        //a foreground image
+        private Texture2D otterFgTexture;
 
+        //a running otter - 1st animation
         CelAnimationSequence otterRunning;
-        CelAnimationPlayer animationPlayer;
+        CelAnimationPlayer otterPlayer;
+        private Vector2 otterRunningDirection = new Vector2();
 
-        private Texture2D otterTexture;
-        private Vector2 otterDirection = new Vector2();
-        private Vector2 otterSpeed = new Vector2(1, 1);
-        //private Rectangle otterRectangle = new Rectangle();
+        //a walking man - 2nd animation
+        private Texture2D walkingManTexture;
+        private Vector2 walkingManDirection = new Vector2();
+        Dictionary<string, Rectangle[]> walkingManRectangle = new Dictionary<string, Rectangle[]>();
+        private string currentAnimation = "right";
+        private int frame = 0;
+        private float timeElapsed = 0.0f;
+        private float timeToUpdate = 1 / 8.0f;
 
         public Game1()
         {
@@ -36,7 +50,8 @@ namespace Lab1_Napat_Phuwarintarawanich
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            otterDirection = new Vector2(300, 320);
+            otterRunningDirection = new Vector2(0, 180);
+            walkingManDirection = new Vector2(290, 280);
         }
 
         protected override void Initialize()
@@ -52,14 +67,21 @@ namespace Lab1_Napat_Phuwarintarawanich
 
             // TODO: use this.Content to load your game content here
             bgTexture = Content.Load<Texture2D>("zoo_background");
-            fgTexture = Content.Load<Texture2D>("otter_sleeping");
-            otterTexture = Content.Load<Texture2D>("otter_idle");
+            otterFgTexture = Content.Load<Texture2D>("otter_sleeping");
+            walkingManTexture = Content.Load<Texture2D>("walking_man");
 
             Texture2D spriteSheet = Content.Load<Texture2D>("otter_running");
-            otterRunning = new CelAnimationSequence(spriteSheet, 200, 1 / 8.0f);
+            otterRunning = new CelAnimationSequence(spriteSheet, 200, 200, 1 / 8.0f, 5, 2);
 
-            animationPlayer = new CelAnimationPlayer();
-            animationPlayer.Play(otterRunning);
+            //play a multi-row sprite sheet animation
+            otterPlayer = new CelAnimationPlayer();
+            otterPlayer.Play(otterRunning);
+
+            //specific each frame's rectangle for a walking man (key input)
+            walkingManRectangle["right"] = new Rectangle[4] { new Rectangle(0, 458, 102, 153), new Rectangle(102, 458, 102, 153), new Rectangle(204, 458, 102, 153), new Rectangle(306, 458, 102, 153) };
+            walkingManRectangle["left"] = new Rectangle[4] { new Rectangle(0, 305, 102, 153), new Rectangle(102, 305, 102, 153), new Rectangle(204, 305, 102, 153), new Rectangle(306, 305, 102, 153) };
+            walkingManRectangle["up"] = new Rectangle[4] { new Rectangle(0, 153, 102, 153), new Rectangle(102, 153, 102, 153), new Rectangle(204, 153, 102, 153), new Rectangle(306, 153, 102, 153) };
+            walkingManRectangle["down"] = new Rectangle[4] { new Rectangle(0, 0, 102, 153), new Rectangle(102, 0, 102, 153), new Rectangle(204, 0, 102, 153), new Rectangle(306, 0, 102, 153) };
         }
 
         protected override void Update(GameTime gameTime)
@@ -68,112 +90,79 @@ namespace Lab1_Napat_Phuwarintarawanich
                 Exit();
 
             // TODO: Add your update logic here
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            timeElapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (timeElapsed > timeToUpdate)
             {
-                //otterDirection.Y = 0;
-                otterDirection.X += Speed;
-                if (otterDirection.X >= _graphics.PreferredBackBufferWidth - otterTexture.Width)
+                timeElapsed -= timeToUpdate;
+
+                if (Keyboard.GetState().IsKeyDown(Keys.Right))
                 {
-                    otterDirection.X = _graphics.PreferredBackBufferWidth - otterTexture.Width;
+                    walkingManDirection.X += Speed;
+                    currentAnimation = "right";
+
+                    frame++;
+                    if (frame == SpriteColumn)
+                    {
+                        frame = 0;
+                    }
+
+                    if (walkingManDirection.X >= MaxRigth)
+                    {
+                        walkingManDirection.X = MaxRigth;
+                    }
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                {
+                    walkingManDirection.X -= Speed;
+                    currentAnimation = "left";
+
+                    frame++;
+                    if (frame == SpriteColumn)
+                    {
+                        frame = 0;
+                    }
+
+                    if (walkingManDirection.X <= MaxLeft)
+                    {
+                        walkingManDirection.X = MaxLeft;
+                    }
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.Up))
+                {
+                    walkingManDirection.Y -= Speed;
+                    currentAnimation = "up";
+
+                    frame++;
+                    if (frame == SpriteColumn)
+                    {
+                        frame = 0;
+                    }
+
+                    if (walkingManDirection.Y <= MaxUp)
+                    {
+                        walkingManDirection.Y = MaxUp;
+                    }
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.Down))
+                {
+                    walkingManDirection.Y += Speed;
+                    currentAnimation = "down";
+
+                    frame++;
+                    if (frame == SpriteColumn)
+                    {
+                        frame = 0;
+                    }
+
+                    if (walkingManDirection.Y >= MaxDown)
+                    {
+                        walkingManDirection.Y = MaxDown;
+                    }
                 }
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
-            {
-                otterDirection.X -= Speed;
-                if (otterDirection.X <= 0)
-                {
-                    otterDirection.X = 0;
-                }
-            }
+            otterPlayer.Update(gameTime);
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Up))
-            {
-                otterDirection.Y -= Speed;
-                if (otterDirection.Y <= 0)
-                {
-                    otterDirection.Y = 0;
-                }
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Down))
-            {
-                otterDirection.Y += Speed;
-                if (otterDirection.Y >= _graphics.PreferredBackBufferHeight - otterTexture.Height)
-                {
-                    otterDirection.Y = _graphics.PreferredBackBufferHeight - otterTexture.Height;
-                }
-            }
-
-            //if (Keyboard.GetState().IsKeyDown(Keys.Right))
-            //{
-            //    otterDirection.Y = 0;
-            //    otterDirection.X++;
-            //    if (otterRectangle.Right >= _graphics.PreferredBackBufferWidth)
-            //    {
-            //        otterDirection.X = 0;
-            //    }
-            //    otterRectangle.Offset(otterDirection);
-            //}
-
-            //if (Keyboard.GetState().IsKeyDown(Keys.Left))
-            //{
-            //    otterDirection.Y = 0;
-            //    otterDirection.X--;
-            //    if (otterRectangle.Left <= 0)
-            //    {
-            //        otterDirection.X = 0;
-            //    }
-            //    otterRectangle.Offset(otterDirection);
-            //}
-
-            //if (Keyboard.GetState().IsKeyDown(Keys.Up))
-            //{
-            //    otterDirection.X = 0;
-            //    otterDirection.Y--;
-            //    if (otterRectangle.Top <= 0)
-            //    {
-            //        otterDirection.Y = 0;
-            //    }
-            //    otterRectangle.Offset(otterDirection);
-            //}
-
-            //if (Keyboard.GetState().IsKeyDown(Keys.Down))
-            //{
-            //    otterDirection.X = 0;
-            //    otterDirection.Y++;
-            //    if (otterRectangle.Bottom >= _graphics.PreferredBackBufferHeight)
-            //    {
-            //        otterDirection.Y = 0;
-            //    }
-            //    otterRectangle.Offset(otterDirection);
-            //}
-
-            //--not using
-            //if (Keyboard.GetState().IsKeyDown(Keys.Right))
-            //{
-            //    otterDirection.X += 5;
-            //    //otterDirection.Y = 0;
-            //    if (otterR
-            //        . >= _graphics.PreferredBackBufferWidth)
-            //    {
-            //        otterDirection.X = WindowWidth;
-            //    }
-            //    Debug.WriteLine(otterDirection.X);
-            //}
-
-            //if (Keyboard.GetState().IsKeyDown(Keys.Left))
-            //{
-            //    otterDirection.X -= 5;
-            //    //otterDirection.Y = 0;
-            //    if (otterDirection.X <= 0)
-            //    {
-            //        otterDirection.X = 0;
-            //    }
-            //    Debug.WriteLine(otterDirection.X);
-            //}
-            animationPlayer.Update(gameTime, 2);
             base.Update(gameTime);
         }
 
@@ -184,11 +173,12 @@ namespace Lab1_Napat_Phuwarintarawanich
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
             _spriteBatch.Draw(bgTexture, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
-            animationPlayer.Draw(_spriteBatch, Vector2.Zero, SpriteEffects.None);
-            _spriteBatch.Draw(fgTexture, new Rectangle(400, 260, 200, 200), Color.White);
-            //_spriteBatch.Draw(otterTexture, otterRectangle.Location.ToVector2(), Color.White);
-            //_spriteBatch.Draw(otterTexture, otterDirection, Color.White);
-            _spriteBatch.Draw(otterTexture, otterDirection, Color.White);
+            //an animation sequence that is represented by a texture with more than one row (a multi-row sprite sheet)
+            otterPlayer.Draw(_spriteBatch, otterRunningDirection, SpriteEffects.None);
+            //a walking man who responds to key input and animates differently depending on what direction it's moving in
+            _spriteBatch.Draw(walkingManTexture, walkingManDirection, walkingManRectangle[currentAnimation][frame], Color.White);
+            //foreground - otter_sleeping
+            _spriteBatch.Draw(otterFgTexture, new Rectangle(400, 280, 200, 200), Color.White);
             _spriteBatch.End();
             base.Draw(gameTime);
         }

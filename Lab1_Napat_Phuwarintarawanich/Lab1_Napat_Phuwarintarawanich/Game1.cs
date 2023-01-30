@@ -38,7 +38,7 @@ namespace Lab1_Napat_Phuwarintarawanich
         private Vector2 walkingManDirection = new Vector2();
         Dictionary<string, Rectangle[]> walkingManRectangle = new Dictionary<string, Rectangle[]>();
         private string currentAnimation = "right";
-        private int frame = 0;
+        private int frame = 1;
         private float timeElapsed = 0.0f;
         private float timeToUpdate = 1 / 8.0f;
 

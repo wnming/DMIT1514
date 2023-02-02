@@ -18,8 +18,10 @@ namespace Lab2_Napat_Phuwarintarawanich
         const int WindowWidth = 601;
         const int WindowHeight = 601;
 
-        //MouseState currentMouseState;
+        MouseState mouseState;
         MouseState previousMouseState;
+
+        Rectangle[,] GameBoard = new Rectangle[3, 3]; 
 
         public enum Turn
         {
@@ -96,6 +98,8 @@ namespace Lab2_Napat_Phuwarintarawanich
 
             switch (currentGameState)
             {
+                //make sure every rectangle exists on board
+                //if all the rectangle rea
                 case GameState.Initialize:
                     break;
                 case GameState.WaitForPlayerMove:
@@ -110,7 +114,7 @@ namespace Lab2_Napat_Phuwarintarawanich
                     break;
             }
 
-            if (previousMouseState.LeftButton == ButtonState.Pressed && currentMouseState.LeftButton == ButtonState.Released)
+            if (previousMouseState.LeftButton == ButtonState.Pressed && currentMouseState == MouseButtonStates.IsReleased)
             {
                 //there has been a mouse click (mouse release)
                 playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
@@ -143,8 +147,8 @@ namespace Lab2_Napat_Phuwarintarawanich
             }
 
             Vector2 adjustedMousePosition =
-                new Vector2(currentMouseState.Position.X - (xTexture.Width / 2),
-                    currentMouseState.Position.Y - (xTexture.Height / 2));
+                new Vector2(mouseState.Position.X - (xTexture.Width / 2),
+                    mouseState.Position.Y - (xTexture.Height / 2));
 
             Texture2D imageToDraw = playerTurn == Turn.O ? oTexture : xTexture;
 

@@ -21,7 +21,7 @@ namespace Lab2_Napat_Phuwarintarawanich
         MouseState mouseState;
         MouseState previousMouseState;
 
-        Rectangle[,] GameBoard = new Rectangle[3, 3]; 
+        Tile[,] GameBoard = new Tile[3, 3]; 
 
         public enum Turn
         {
@@ -62,7 +62,16 @@ namespace Lab2_Napat_Phuwarintarawanich
             graphics.ApplyChanges();
 
             playerTurn = Turn.X;
-            
+
+            currentMouseState = MouseButtonStates.IsReleased;
+            for (int row = 0; row < 3; row++)
+            {
+                for (int col = 0; col < 3; col++)
+                {
+                    GameBoard[col, row] = new Tile(new Rectangle(new Point((col * 50) + (col * 10), (row * 50) + (row * 20))
+                        }
+            }
+
             base.Initialize();
         }
 
@@ -101,6 +110,11 @@ namespace Lab2_Napat_Phuwarintarawanich
                 //make sure every rectangle exists on board
                 //if all the rectangle rea
                 case GameState.Initialize:
+                    currentMouseState = MouseButtonStates.IsReleased;
+                    foreach(Tile tile in GameBoard)
+                    {
+                        tile.Reset();
+                    }
                     break;
                 case GameState.WaitForPlayerMove:
                     break;
@@ -155,6 +169,38 @@ namespace Lab2_Napat_Phuwarintarawanich
             spriteBatch.Begin();
             spriteBatch.Draw(backgroundImage, Vector2.Zero, Color.White);
             spriteBatch.Draw(imageToDraw, adjustedMousePosition, Color.White);
+            //for (int row = 0; row < 3; row++)
+            //{
+            //    for (int col = 0; col < 3; col++)
+            //    {
+            //        if (tileState[col,row] != TileVisualState.BlankState)
+            //        {
+            //            if (tileState[col, row] == TileVisualState.XTileState)
+            //            {
+            //                spriteBatch.Draw(xTexture, GameBoard[col, row], Color.White);
+            //            }else if(tileState[col, row] == TileVisualState.XTileState)
+            //            {
+            //                spriteBatch.Draw(oTexture, GameBoard[col, row], Color.White);
+            //            }
+            //        }
+            //    }
+            //}
+            foreach(Tile tile in GameBoard)
+            {
+                Texture2D texture2D = null;
+                if(tile._TileState == Tile.TileState.X)
+                {
+                    texture2D = xTexture;
+                }
+                else
+                {
+                    if(tile._TileState == Tile.TileState.O)
+                    {
+                        texture2D = oTexture;
+                    }
+                }
+                spriteBatch.Draw(texture2D, tile._Rectangle, Color.White);
+            }
             spriteBatch.End();
 
             base.Draw(gameTime);

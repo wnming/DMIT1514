@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Diagnostics;
 using System.Security.Cryptography;
 
@@ -15,8 +16,8 @@ namespace Lab2_Napat_Phuwarintarawanich
         Texture2D xTexture;
         Texture2D oTexture;
 
-        const int WindowWidth = 601;
-        const int WindowHeight = 601;
+        const int WindowWidth = 600;
+        const int WindowHeight = 600;
 
         Tile[,] GameBoard = new Tile[3, 3]; 
 
@@ -33,6 +34,7 @@ namespace Lab2_Napat_Phuwarintarawanich
             WaitForPlayerMove,
             MakePlayerMove,
             EvaluatePlayerMove,
+            EvalBoard,
             GameOver
         }
         GameState currentGameState = GameState.Initialize;
@@ -70,7 +72,7 @@ namespace Lab2_Napat_Phuwarintarawanich
                 for (int col = 0; col < 3; col++)
                 {
                     GameBoard[col, row] =
-                        new Tile(new Rectangle(new Point((col * 50) + (col * 10), (row * 50) + (row * 20)), new(50,50)));
+                        new Tile(new Rectangle(new Point((col * 190) + (col * 10) + 10, (row * 190) + (row * 10) + 10), new(160, 160)));
                 }
             }
 
@@ -131,10 +133,43 @@ namespace Lab2_Napat_Phuwarintarawanich
                     currentGameState = GameState.EvaluatePlayerMove;
                     break;
                 case GameState.EvaluatePlayerMove:
+                    //Debug.WriteLine(currentPosition.X);
+                    //Debug.WriteLine(currentPosition.Y);
+                    //Debug.WriteLine(GameBoard[0, 0]._Rectangle);
+
+                    ////playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
+                    //GameBoard[0, 0] = new Tile(new Rectangle(new Point((0 * 170) + (0 * 170) + 25, (0 * 170) + (0 * 170) + 25), new (170, 170)), Tile.TileState.X);
+                    //Debug.WriteLine(GameBoard[0, 0]._Rectangle);
                     //playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
-                    GameBoard[0, 0] = Tile.TileState.X;
+                    //if(currentMouseState == MouseButtonStates.IsPressed)
+                    //{
+                        //playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
+                    Debug.WriteLine(playerTurn);
+                    foreach (Tile tile in GameBoard)
+                    {
+                        if (tile.TrySetState(currentPosition.Position, (Tile.TileState)(int)playerTurn + 1))
+                        {
+                            currentGameState = GameState.WaitForPlayerMove;
+                        }
+                    }
                     playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
-                    currentGameState = GameState.WaitForPlayerMove;
+                    //playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
+                    //}
+                    Debug.WriteLine(playerTurn);
+                    //playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
+                    break;
+                case GameState.EvalBoard:
+                    //gameboard[x,y]._tileState == gameboard[x+1,y]._tileState == gameboard[x+2,y]._tileState and gameboard[x,y]._tileState != TileState.Blank
+                    //for (int row = 0; row < 3; row++)
+                    //{
+                    //    for (int col = 0; col < 3; col++)
+                    //    {
+                    //        if ()
+                    //        {
+
+                    //        }
+                    //    }
+                    //}
                     break;
                 case GameState.GameOver:
                     break;
@@ -155,6 +190,26 @@ namespace Lab2_Napat_Phuwarintarawanich
 
             spriteBatch.Begin();
             spriteBatch.Draw(backgroundImage, Vector2.Zero, Color.White);
+
+            foreach (Tile tile in GameBoard)
+            {
+                Texture2D texture2D = null;
+                if (tile._TileState == Tile.TileState.X)
+                {
+                    texture2D = xTexture;
+                }
+                else
+                {
+                    if (tile._TileState == Tile.TileState.O)
+                    {
+                        texture2D = oTexture;
+                    }
+                }
+                if (texture2D != null)
+                {
+                    spriteBatch.Draw(texture2D, tile._Rectangle, Color.White);
+                }
+            }
 
             switch (currentGameState)
             {
@@ -194,25 +249,6 @@ namespace Lab2_Napat_Phuwarintarawanich
             //    }
             //}
 
-            foreach (Tile tile in GameBoard)
-            {
-                Texture2D texture2D = null;
-                if (tile._TileState == Tile.TileState.X)
-                {
-                    texture2D = xTexture;
-                }
-                else
-                {
-                    if (tile._TileState == Tile.TileState.O)
-                    {
-                        texture2D = oTexture;
-                    }
-                }
-                if (texture2D != null)
-                {
-                    spriteBatch.Draw(texture2D, tile._Rectangle, Color.White);
-                }
-            }
             spriteBatch.End();
 
             base.Draw(gameTime);

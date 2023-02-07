@@ -18,9 +18,6 @@ namespace Lab2_Napat_Phuwarintarawanich
         const int WindowWidth = 601;
         const int WindowHeight = 601;
 
-        MouseState mouseState;
-        MouseState previousMouseState;
-
         Tile[,] GameBoard = new Tile[3, 3]; 
 
         public enum Turn
@@ -47,7 +44,10 @@ namespace Lab2_Napat_Phuwarintarawanich
             WasPressedThisFrame,
             WasReleasedThisFrame
         }
-        MouseButtonStates currentMouseState = MouseButtonStates.IsReleased;
+        MouseButtonStates currentMouseState;
+        MouseButtonStates previousMouseState;
+
+        MouseState currentPosition;
 
         public Game1()
         {
@@ -62,14 +62,16 @@ namespace Lab2_Napat_Phuwarintarawanich
             graphics.ApplyChanges();
 
             playerTurn = Turn.X;
-
             currentMouseState = MouseButtonStates.IsReleased;
+            previousMouseState = MouseButtonStates.IsReleased;
+
             for (int row = 0; row < 3; row++)
             {
                 for (int col = 0; col < 3; col++)
                 {
-                    GameBoard[col, row] = new Tile(new Rectangle(new Point((col * 50) + (col * 10), (row * 50) + (row * 20))
-                        }
+                    GameBoard[col, row] =
+                        new Tile(new Rectangle(new Point((col * 50) + (col * 10), (row * 50) + (row * 20)), new(50,50)));
+                }
             }
 
             base.Initialize();
@@ -87,23 +89,24 @@ namespace Lab2_Napat_Phuwarintarawanich
         {
             //currentMouseState = Mouse.GetState();
 
-            switch (currentMouseState)
-            {
-                case MouseButtonStates.IsReleased:
-                    if(Mouse.GetState().LeftButton == ButtonState.Pressed)
-                    {
-                        currentMouseState = MouseButtonStates.WasPressedThisFrame;
-                    }
-                    break;
-                case MouseButtonStates.IsPressed:
-                    if (Mouse.GetState().LeftButton == ButtonState.Released)
-                    {
-                        currentMouseState = MouseButtonStates.WasReleasedThisFrame;
-                    }
-                    break;
-                default:
-                    break;
-            }
+            //switch (currentMouseState)
+            //{
+            //    case MouseButtonStates.IsReleased:
+            //        if(Mouse.GetState().LeftButton == ButtonState.Pressed)
+            //        {
+            //            currentMouseState = MouseButtonStates.WasPressedThisFrame;
+            //        }
+            //        break;
+            //    case MouseButtonStates.IsPressed:
+            //        if (Mouse.GetState().LeftButton == ButtonState.Released)
+            //        {
+            //            currentMouseState = MouseButtonStates.WasReleasedThisFrame;
+            //        }
+            //        break;
+            //    default:
+            //        break;
+            //}
+            currentPosition = Mouse.GetState();
 
             switch (currentGameState)
             {
@@ -111,16 +114,27 @@ namespace Lab2_Napat_Phuwarintarawanich
                 //if all the rectangle rea
                 case GameState.Initialize:
                     currentMouseState = MouseButtonStates.IsReleased;
+                    currentGameState = GameState.WaitForPlayerMove;
                     foreach(Tile tile in GameBoard)
                     {
                         tile.Reset();
                     }
                     break;
                 case GameState.WaitForPlayerMove:
+                    if (previousMouseState == MouseButtonStates.IsPressed && currentMouseState == MouseButtonStates.IsReleased)
+                    {
+                        currentGameState = GameState.MakePlayerMove;
+                        //playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
+                    }
                     break;
                 case GameState.MakePlayerMove:
+                    currentGameState = GameState.EvaluatePlayerMove;
                     break;
                 case GameState.EvaluatePlayerMove:
+                    //playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
+                    GameBoard[0, 0] = Tile.TileState.X;
+                    playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
+                    currentGameState = GameState.WaitForPlayerMove;
                     break;
                 case GameState.GameOver:
                     break;
@@ -128,13 +142,8 @@ namespace Lab2_Napat_Phuwarintarawanich
                     break;
             }
 
-            if (previousMouseState.LeftButton == ButtonState.Pressed && currentMouseState == MouseButtonStates.IsReleased)
-            {
-                //there has been a mouse click (mouse release)
-                playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
-            }
-
             //previousMouseState = currentMouseState;
+            previousMouseState = currentMouseState;
             currentMouseState = (MouseButtonStates)Mouse.GetState().LeftButton;
 
             base.Update(gameTime);
@@ -144,11 +153,19 @@ namespace Lab2_Napat_Phuwarintarawanich
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            spriteBatch.Begin();
+            spriteBatch.Draw(backgroundImage, Vector2.Zero, Color.White);
+
             switch (currentGameState)
             {
                 case GameState.Initialize:
                     break;
                 case GameState.WaitForPlayerMove:
+                    Vector2 adjustedMousePosition = new Vector2(currentPosition.Position.X - (xTexture.Width / 2),
+                    currentPosition.Position.Y - (xTexture.Height / 2));
+
+                    Texture2D imageToDraw = playerTurn == Turn.O ? oTexture : xTexture;
+                    spriteBatch.Draw(imageToDraw, adjustedMousePosition, Color.White);
                     break;
                 case GameState.MakePlayerMove:
                     break;
@@ -160,15 +177,6 @@ namespace Lab2_Napat_Phuwarintarawanich
                     break;
             }
 
-            Vector2 adjustedMousePosition =
-                new Vector2(mouseState.Position.X - (xTexture.Width / 2),
-                    mouseState.Position.Y - (xTexture.Height / 2));
-
-            Texture2D imageToDraw = playerTurn == Turn.O ? oTexture : xTexture;
-
-            spriteBatch.Begin();
-            spriteBatch.Draw(backgroundImage, Vector2.Zero, Color.White);
-            spriteBatch.Draw(imageToDraw, adjustedMousePosition, Color.White);
             //for (int row = 0; row < 3; row++)
             //{
             //    for (int col = 0; col < 3; col++)
@@ -185,21 +193,25 @@ namespace Lab2_Napat_Phuwarintarawanich
             //        }
             //    }
             //}
-            foreach(Tile tile in GameBoard)
+
+            foreach (Tile tile in GameBoard)
             {
                 Texture2D texture2D = null;
-                if(tile._TileState == Tile.TileState.X)
+                if (tile._TileState == Tile.TileState.X)
                 {
                     texture2D = xTexture;
                 }
                 else
                 {
-                    if(tile._TileState == Tile.TileState.O)
+                    if (tile._TileState == Tile.TileState.O)
                     {
                         texture2D = oTexture;
                     }
                 }
-                spriteBatch.Draw(texture2D, tile._Rectangle, Color.White);
+                if (texture2D != null)
+                {
+                    spriteBatch.Draw(texture2D, tile._Rectangle, Color.White);
+                }
             }
             spriteBatch.End();
 

@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Diagnostics;
-using System.Security.Cryptography;
 
 namespace Lab2_Napat_Phuwarintarawanich
 {
@@ -15,6 +12,12 @@ namespace Lab2_Napat_Phuwarintarawanich
         Texture2D backgroundImage;
         Texture2D xTexture;
         Texture2D oTexture;
+        Texture2D newGameTexture;
+
+        Vector2 newGameDirection = new Vector2();
+        Rectangle newGameRectangle = new Rectangle();
+
+        SpriteFont font;
 
         const int WindowWidth = 600;
         const int WindowHeight = 600;
@@ -42,14 +45,15 @@ namespace Lab2_Napat_Phuwarintarawanich
         public enum MouseButtonStates
         {
             IsReleased,
-            IsPressed,
-            WasPressedThisFrame,
-            WasReleasedThisFrame
+            IsPressed
         }
         MouseButtonStates currentMouseState;
         MouseButtonStates previousMouseState;
 
         MouseState currentPosition;
+
+        bool gameOver = false;
+        string gameWinner;
 
         public Game1()
         {
@@ -72,11 +76,15 @@ namespace Lab2_Napat_Phuwarintarawanich
                 for (int col = 0; col < 3; col++)
                 {
                     GameBoard[col, row] =
-                        new Tile(new Rectangle(new Point((col * 190) + (col * 10) + 10, (row * 190) + (row * 10) + 10), new(160, 160)));
+                        new Tile(new Rectangle(new Point((col * 190) + (col * 5) + 30, (row * 190) + (row * 5) + 30), new(150, 150)));
                 }
             }
 
             base.Initialize();
+
+            newGameDirection = new Vector2(140, 250);
+            newGameRectangle = newGameTexture.Bounds;
+            newGameRectangle.Offset(newGameDirection);
         }
 
         protected override void LoadContent()
@@ -85,39 +93,21 @@ namespace Lab2_Napat_Phuwarintarawanich
             backgroundImage = Content.Load<Texture2D>("TicTacToeBoard");
             xTexture = Content.Load<Texture2D>("X");
             oTexture = Content.Load<Texture2D>("O");
+            newGameTexture = Content.Load<Texture2D>("start-new-game");
+            font = Content.Load<SpriteFont>("RoseQuay");
         }
 
         protected override void Update(GameTime gameTime)
         {
-            //currentMouseState = Mouse.GetState();
-
-            //switch (currentMouseState)
-            //{
-            //    case MouseButtonStates.IsReleased:
-            //        if(Mouse.GetState().LeftButton == ButtonState.Pressed)
-            //        {
-            //            currentMouseState = MouseButtonStates.WasPressedThisFrame;
-            //        }
-            //        break;
-            //    case MouseButtonStates.IsPressed:
-            //        if (Mouse.GetState().LeftButton == ButtonState.Released)
-            //        {
-            //            currentMouseState = MouseButtonStates.WasReleasedThisFrame;
-            //        }
-            //        break;
-            //    default:
-            //        break;
-            //}
             currentPosition = Mouse.GetState();
 
             switch (currentGameState)
             {
-                //make sure every rectangle exists on board
-                //if all the rectangle rea
                 case GameState.Initialize:
                     currentMouseState = MouseButtonStates.IsReleased;
                     currentGameState = GameState.WaitForPlayerMove;
-                    foreach(Tile tile in GameBoard)
+                    playerTurn = Turn.X;
+                    foreach (Tile tile in GameBoard)
                     {
                         tile.Reset();
                     }
@@ -126,58 +116,70 @@ namespace Lab2_Napat_Phuwarintarawanich
                     if (previousMouseState == MouseButtonStates.IsPressed && currentMouseState == MouseButtonStates.IsReleased)
                     {
                         currentGameState = GameState.MakePlayerMove;
-                        //playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
                     }
                     break;
                 case GameState.MakePlayerMove:
                     currentGameState = GameState.EvaluatePlayerMove;
                     break;
                 case GameState.EvaluatePlayerMove:
-                    //Debug.WriteLine(currentPosition.X);
-                    //Debug.WriteLine(currentPosition.Y);
-                    //Debug.WriteLine(GameBoard[0, 0]._Rectangle);
-
-                    ////playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
-                    //GameBoard[0, 0] = new Tile(new Rectangle(new Point((0 * 170) + (0 * 170) + 25, (0 * 170) + (0 * 170) + 25), new (170, 170)), Tile.TileState.X);
-                    //Debug.WriteLine(GameBoard[0, 0]._Rectangle);
-                    //playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
-                    //if(currentMouseState == MouseButtonStates.IsPressed)
-                    //{
-                        //playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
-                    Debug.WriteLine(playerTurn);
                     foreach (Tile tile in GameBoard)
                     {
                         if (tile.TrySetState(currentPosition.Position, (Tile.TileState)(int)playerTurn + 1))
                         {
-                            currentGameState = GameState.WaitForPlayerMove;
+                            currentGameState = GameState.EvalBoard;
                         }
                     }
                     playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
-                    //playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
-                    //}
-                    Debug.WriteLine(playerTurn);
-                    //playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
                     break;
                 case GameState.EvalBoard:
-                    //gameboard[x,y]._tileState == gameboard[x+1,y]._tileState == gameboard[x+2,y]._tileState and gameboard[x,y]._tileState != TileState.Blank
-                    //for (int row = 0; row < 3; row++)
-                    //{
-                    //    for (int col = 0; col < 3; col++)
-                    //    {
-                    //        if ()
-                    //        {
-
-                    //        }
-                    //    }
-                    //}
+                    Winner winner = new Winner();
+                    if (winner.CheckTheWinner(0, 0, 0, 0, 1, 2, GameBoard) || winner.CheckTheWinner(1, 1, 1, 0, 1, 2, GameBoard)
+                        || winner.CheckTheWinner(2, 2, 2, 0, 1, 2, GameBoard) || winner.CheckTheWinner(0, 1, 2, 0, 0, 0, GameBoard)
+                        || winner.CheckTheWinner(0, 1, 2, 1, 1, 1, GameBoard) || winner.CheckTheWinner(0, 1, 2, 2, 2, 2, GameBoard)
+                        || winner.CheckTheWinner(0, 1, 2, 0, 1, 2, GameBoard) || winner.CheckTheWinner(2, 1, 0, 0, 1, 2, GameBoard))
+                    {
+                        gameWinner = $"The winner is {winner._WinTile}";
+                        gameOver = true;
+                        currentGameState = GameState.GameOver;
+                    }
+                    else
+                    {
+                        if (!gameOver)
+                        {
+                            int countBlank = 0;
+                            foreach (Tile tile in GameBoard)
+                            {
+                                if (tile._TileState == Tile.TileState.Blank)
+                                {
+                                    countBlank++;
+                                }
+                            }
+                            if (countBlank == 0)
+                            {
+                                gameWinner = "...... It is a Tie ......";
+                                gameOver = true;
+                                currentGameState = GameState.GameOver;
+                            }
+                            else
+                            {
+                                currentGameState = GameState.WaitForPlayerMove;
+                            }
+                        }
+                    }
                     break;
                 case GameState.GameOver:
+                    this.IsMouseVisible = true;
+                    if (newGameRectangle.Contains(new Point(currentPosition.X, currentPosition.Y)) 
+                        && previousMouseState == MouseButtonStates.IsPressed && currentMouseState == MouseButtonStates.IsReleased)
+                    {
+                        currentGameState = GameState.Initialize;
+                        gameOver = false;
+                    }
                     break;
                 default:
                     break;
             }
 
-            //previousMouseState = currentMouseState;
             previousMouseState = currentMouseState;
             currentMouseState = (MouseButtonStates)Mouse.GetState().LeftButton;
 
@@ -186,68 +188,49 @@ namespace Lab2_Napat_Phuwarintarawanich
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
             spriteBatch.Begin();
-            spriteBatch.Draw(backgroundImage, Vector2.Zero, Color.White);
 
-            foreach (Tile tile in GameBoard)
+            if (!gameOver)
             {
-                Texture2D texture2D = null;
-                if (tile._TileState == Tile.TileState.X)
+                spriteBatch.Draw(backgroundImage, Vector2.Zero, Color.White);
+                foreach (Tile tile in GameBoard)
                 {
-                    texture2D = xTexture;
-                }
-                else
-                {
-                    if (tile._TileState == Tile.TileState.O)
+                    Texture2D texture2D = tile._TileState == Tile.TileState.X ? xTexture : tile._TileState == Tile.TileState.O ? oTexture : null;
+                    if (texture2D != null)
                     {
-                        texture2D = oTexture;
+                        spriteBatch.Draw(texture2D, tile._Rectangle, Color.White);
                     }
                 }
-                if (texture2D != null)
+
+                switch (currentGameState)
                 {
-                    spriteBatch.Draw(texture2D, tile._Rectangle, Color.White);
+                    case GameState.Initialize:
+                        break;
+                    case GameState.WaitForPlayerMove:
+                        Vector2 adjustedMousePosition = new Vector2(currentPosition.Position.X - (xTexture.Width / 2),
+                        currentPosition.Position.Y - (xTexture.Height / 2));
+
+                        Texture2D imageToDraw = playerTurn == Turn.O ? oTexture : xTexture;
+                        spriteBatch.Draw(imageToDraw, adjustedMousePosition, Color.White);
+                        break;
+                    case GameState.MakePlayerMove:
+                        break;
+                    case GameState.EvaluatePlayerMove:
+                        break;
+                    case GameState.GameOver:
+                        break;
+                    default:
+                        break;
                 }
             }
-
-            switch (currentGameState)
+            else
             {
-                case GameState.Initialize:
-                    break;
-                case GameState.WaitForPlayerMove:
-                    Vector2 adjustedMousePosition = new Vector2(currentPosition.Position.X - (xTexture.Width / 2),
-                    currentPosition.Position.Y - (xTexture.Height / 2));
-
-                    Texture2D imageToDraw = playerTurn == Turn.O ? oTexture : xTexture;
-                    spriteBatch.Draw(imageToDraw, adjustedMousePosition, Color.White);
-                    break;
-                case GameState.MakePlayerMove:
-                    break;
-                case GameState.EvaluatePlayerMove:
-                    break;
-                case GameState.GameOver:
-                    break;
-                default:
-                    break;
+                Vector2 textCenter = font.MeasureString("") / 2f;
+                spriteBatch.DrawString(font, gameWinner, new Vector2(110, 150), Color.DarkGoldenrod, 0, textCenter, 2.0f, SpriteEffects.None, 0);
+                spriteBatch.Draw(newGameTexture, newGameDirection, Color.White);
             }
-
-            //for (int row = 0; row < 3; row++)
-            //{
-            //    for (int col = 0; col < 3; col++)
-            //    {
-            //        if (tileState[col,row] != TileVisualState.BlankState)
-            //        {
-            //            if (tileState[col, row] == TileVisualState.XTileState)
-            //            {
-            //                spriteBatch.Draw(xTexture, GameBoard[col, row], Color.White);
-            //            }else if(tileState[col, row] == TileVisualState.XTileState)
-            //            {
-            //                spriteBatch.Draw(oTexture, GameBoard[col, row], Color.White);
-            //            }
-            //        }
-            //    }
-            //}
 
             spriteBatch.End();
 

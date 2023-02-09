@@ -52,8 +52,11 @@ namespace Lab2_Napat_Phuwarintarawanich
 
         MouseState currentPosition;
 
-        bool gameOver = false;
+        bool gameOver;
         string gameWinner;
+
+        int color;
+        int code;
 
         public Game1()
         {
@@ -67,6 +70,8 @@ namespace Lab2_Napat_Phuwarintarawanich
             graphics.PreferredBackBufferHeight = WindowHeight;
             graphics.ApplyChanges();
 
+            color = 0;
+            gameOver = false;
             playerTurn = Turn.X;
             currentMouseState = MouseButtonStates.IsReleased;
             previousMouseState = MouseButtonStates.IsReleased;
@@ -107,6 +112,7 @@ namespace Lab2_Napat_Phuwarintarawanich
                     currentMouseState = MouseButtonStates.IsReleased;
                     currentGameState = GameState.WaitForPlayerMove;
                     playerTurn = Turn.X;
+                    gameOver = false;
                     foreach (Tile tile in GameBoard)
                     {
                         tile.Reset();
@@ -122,14 +128,24 @@ namespace Lab2_Napat_Phuwarintarawanich
                     currentGameState = GameState.EvaluatePlayerMove;
                     break;
                 case GameState.EvaluatePlayerMove:
+                    //clickOnBlank, prevent clicking on a reserved spot
+                    bool clickOnBlank = false;
                     foreach (Tile tile in GameBoard)
                     {
                         if (tile.TrySetState(currentPosition.Position, (Tile.TileState)(int)playerTurn + 1))
                         {
                             currentGameState = GameState.EvalBoard;
+                            clickOnBlank = true;
                         }
                     }
-                    playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
+                    if (clickOnBlank)
+                    {
+                        playerTurn = playerTurn == Turn.X ? Turn.O : Turn.X;
+                    }
+                    else
+                    {
+                        currentGameState = GameState.WaitForPlayerMove;
+                    }
                     break;
                 case GameState.EvalBoard:
                     Winner winner = new Winner();
@@ -173,7 +189,20 @@ namespace Lab2_Napat_Phuwarintarawanich
                         && previousMouseState == MouseButtonStates.IsPressed && currentMouseState == MouseButtonStates.IsReleased)
                     {
                         currentGameState = GameState.Initialize;
-                        gameOver = false;
+                    }
+                    //blinking the winner text
+                    switch (color)
+                    {
+                        case 0:
+                            code += 3;
+                            if (code == 255)
+                                color = 1;
+                            break;
+                        case 1:
+                            code -= 3;
+                            if (code == 0)
+                                color = 0;
+                            break;
                     }
                     break;
                 default:
@@ -228,7 +257,7 @@ namespace Lab2_Napat_Phuwarintarawanich
             else
             {
                 Vector2 textCenter = font.MeasureString("") / 2f;
-                spriteBatch.DrawString(font, gameWinner, new Vector2(110, 150), Color.DarkGoldenrod, 0, textCenter, 2.0f, SpriteEffects.None, 0);
+                spriteBatch.DrawString(font, gameWinner, new Vector2(110, 150), new Color(code, 0, 0, code), 0, textCenter, 2.0f, SpriteEffects.None, 0);
                 spriteBatch.Draw(newGameTexture, newGameDirection, Color.White);
             }
 

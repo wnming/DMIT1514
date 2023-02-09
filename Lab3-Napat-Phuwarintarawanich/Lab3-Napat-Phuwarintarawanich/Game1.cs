@@ -23,6 +23,17 @@ namespace Lab3_Napat_Phuwarintarawanich
         private Rectangle paddleLeftRectangle = new Rectangle();
         private Rectangle paddleRightRectangle = new Rectangle();
 
+        public enum GameState
+        {
+            Initialize,
+            WaitForPlayerMove,
+            MakePlayerMove,
+            EvaluatePlayerMove,
+            EvalBoard,
+            GameOver
+        }
+        GameState currentGameState = GameState.Initialize;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);

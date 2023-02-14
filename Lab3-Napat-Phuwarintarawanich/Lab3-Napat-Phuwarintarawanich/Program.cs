@@ -1,3 +1,3 @@
 ﻿
-using var game = new Lab3_Napat_Phuwarintarawanich.Game1();
+using var game = new Lab3_Napat_Phuwarintarawanich.Pong();
 game.Run();

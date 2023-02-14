@@ -4,13 +4,13 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Lab3_Napat_Phuwarintarawanich
 {
-    public class Game1 : Game
+    public class Pong : Game
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private const int WindowWidth = 650;
-        private const int WindowHeight = 400;
+        private const int WindowWidth = 750;
+        private const int WindowHeight = 500;
 
         private Texture2D bgTexture;
         private Texture2D pongBallTexture;
@@ -19,9 +19,14 @@ namespace Lab3_Napat_Phuwarintarawanich
 
         private Vector2 paddleLeftDirection;
         private Vector2 paddleRightDirection;
+        private Vector2 pongBallDirection;
 
         private Rectangle paddleLeftRectangle = new Rectangle();
         private Rectangle paddleRightRectangle = new Rectangle();
+        private Rectangle pongBallRectangle = new Rectangle();
+
+        private float timeElapsed = 0.0f;
+        private float timeToUpdate = 1 / 8.0f;
 
         public enum GameState
         {
@@ -34,7 +39,7 @@ namespace Lab3_Napat_Phuwarintarawanich
         }
         GameState currentGameState = GameState.Initialize;
 
-        public Game1()
+        public Pong()
         {
             _graphics = new GraphicsDeviceManager(this);
             _graphics.PreferredBackBufferHeight = WindowHeight;
@@ -48,11 +53,13 @@ namespace Lab3_Napat_Phuwarintarawanich
             base.Initialize();
 
             paddleLeftRectangle = paddleLeftTexture.Bounds;
-            paddleLeftDirection = new Vector2(5, WindowHeight / 2 - paddleLeftRectangle.Height / 2);
-
             paddleRightRectangle = paddleRightTexture.Bounds;
-            paddleRightDirection = new Vector2(WindowWidth - paddleRightRectangle.Width - 5, WindowHeight / 2 - paddleRightRectangle.Height / 2);
+            pongBallRectangle = pongBallTexture.Bounds;
 
+            paddleLeftDirection = new Vector2(5, WindowHeight / 2 - paddleLeftRectangle.Height / 2);
+            paddleRightDirection = new Vector2(WindowWidth - paddleRightRectangle.Width - 5, WindowHeight / 2 - paddleRightRectangle.Height / 2);
+            //pongBallDirection = new Vector2(WindowWidth / 2, WindowHeight / 2);
+            pongBallDirection = new Vector2(5f, 5f);
         }
 
         protected override void LoadContent()
@@ -72,7 +79,26 @@ namespace Lab3_Napat_Phuwarintarawanich
                 Exit();
 
             // TODO: Add your update logic here
-            paddleLeftRectangle.Offset(paddleLeftDirection);
+            //timeElapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //if (timeElapsed > timeToUpdate)
+            //{
+            //    timeElapsed -= timeToUpdate;
+
+                if (pongBallRectangle.Bottom > _graphics.PreferredBackBufferHeight || pongBallRectangle.Top < 0)
+                {
+                    pongBallDirection.Y *= -1;
+                }
+                if (pongBallRectangle.Right > _graphics.PreferredBackBufferWidth || pongBallRectangle.Left < 0)
+                {
+                    pongBallDirection.X *= -1;
+                }
+                //pongBallDirection.X += 5;
+                //pongBallDirection.Y += 5;
+            //}
+            pongBallRectangle.Offset(pongBallDirection);
+
+            //paddleLeftRectangle.Offset(paddleLeftDirection);
+            //paddleRightRectangle.Offset(paddleRightDirection);
 
             base.Update(gameTime);
         }
@@ -86,6 +112,7 @@ namespace Lab3_Napat_Phuwarintarawanich
             _spriteBatch.Draw(bgTexture, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
             _spriteBatch.Draw(paddleLeftTexture, paddleLeftDirection, Color.White);
             _spriteBatch.Draw(paddleRightTexture, paddleRightDirection, Color.White);
+            _spriteBatch.Draw(pongBallTexture, pongBallRectangle.Location.ToVector2(), Color.White);
             _spriteBatch.End();
 
             base.Draw(gameTime);

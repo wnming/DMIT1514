@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Diagnostics;
 
 namespace Lab3_Napat_Phuwarintarawanich
 {
@@ -27,14 +28,14 @@ namespace Lab3_Napat_Phuwarintarawanich
 
         private float timeElapsed = 0.0f;
         private float timeToUpdate = 1 / 8.0f;
+        private const int Speed = 60;
 
         public enum GameState
         {
             Initialize,
             WaitForPlayerMove,
             MakePlayerMove,
-            EvaluatePlayerMove,
-            EvalBoard,
+            EvaluatePoint,
             GameOver
         }
         GameState currentGameState = GameState.Initialize;
@@ -60,6 +61,9 @@ namespace Lab3_Napat_Phuwarintarawanich
             paddleRightDirection = new Vector2(WindowWidth - paddleRightRectangle.Width - 5, WindowHeight / 2 - paddleRightRectangle.Height / 2);
             //pongBallDirection = new Vector2(WindowWidth / 2, WindowHeight / 2);
             pongBallDirection = new Vector2(5f, 5f);
+
+            paddleLeftRectangle = new Rectangle((int)paddleLeftDirection.X, (int)paddleLeftDirection.Y, paddleLeftTexture.Width, paddleLeftTexture.Height);
+            paddleRightRectangle = new Rectangle((int)paddleRightDirection.X, (int)paddleRightDirection.Y, paddleRightTexture.Width, paddleRightTexture.Height);
         }
 
         protected override void LoadContent()
@@ -83,23 +87,93 @@ namespace Lab3_Napat_Phuwarintarawanich
             //if (timeElapsed > timeToUpdate)
             //{
             //    timeElapsed -= timeToUpdate;
+            switch (currentGameState)
+            {
+                case GameState.Initialize:
+                    break;
+                case GameState.WaitForPlayerMove:
+                    break;
+                case GameState.MakePlayerMove:
+                    break;
+                case GameState.EvaluatePoint:
+                    break;
+                case GameState.GameOver:
+                    break;
+                default:
+                    break;
+            }
+            if (paddleLeftRectangle.Intersects(pongBallRectangle) || paddleRightRectangle.Intersects(pongBallRectangle))
+            {
+                //if (pongBallRectangle.Right > _graphics.PreferredBackBufferWidth || pongBallRectangle.Left < 0)
+                //{
+                    pongBallDirection.X *= -1;
+                //}
+            }
 
+            //if (paddleLeftRectangle.Intersects(pongBallRectangle) || paddleRightRectangle.Intersects(pongBallRectangle))
+            //{
                 if (pongBallRectangle.Bottom > _graphics.PreferredBackBufferHeight || pongBallRectangle.Top < 0)
                 {
                     pongBallDirection.Y *= -1;
                 }
-                if (pongBallRectangle.Right > _graphics.PreferredBackBufferWidth || pongBallRectangle.Left < 0)
-                {
-                    pongBallDirection.X *= -1;
-                }
-                //pongBallDirection.X += 5;
-                //pongBallDirection.Y += 5;
+                //if (pongBallRectangle.Right > _graphics.PreferredBackBufferWidth || pongBallRectangle.Left < 0)
+                //{
+                //    pongBallDirection.X *= -1;
+                //}
+                pongBallRectangle.Offset(pongBallDirection);
             //}
-            pongBallRectangle.Offset(pongBallDirection);
 
-            //paddleLeftRectangle.Offset(paddleLeftDirection);
-            //paddleRightRectangle.Offset(paddleRightDirection);
+            timeElapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (timeElapsed > timeToUpdate)
+            {
+                timeElapsed -= timeToUpdate;
 
+                //paddle right -> up/down
+                if (Keyboard.GetState().IsKeyDown(Keys.Up))
+                {
+                    paddleRightDirection.Y -= Speed;
+
+                    if (paddleRightDirection.Y <= 0)
+                    {
+                        paddleRightDirection.Y = 0;
+                    }
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.Down))
+                {
+                    paddleRightDirection.Y += Speed;
+
+                    if (paddleRightDirection.Y >= WindowHeight - paddleRightRectangle.Height)
+                    {
+                        paddleRightDirection.Y = WindowHeight - paddleRightRectangle.Height;
+                    }
+                }
+                paddleRightRectangle.X = (int)paddleRightDirection.X;
+                paddleRightRectangle.Y = (int)paddleRightDirection.Y;
+
+                //paddle left -> w/s
+                if (Keyboard.GetState().IsKeyDown(Keys.W))
+                {
+                    paddleLeftDirection.Y -= Speed;
+
+                    if (paddleLeftDirection.Y <= 0)
+                    {
+                        paddleLeftDirection.Y = 0;
+                    }
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.S))
+                {
+                    paddleLeftDirection.Y += Speed;
+
+                    if (paddleLeftDirection.Y >= WindowHeight - paddleLeftRectangle.Height)
+                    {
+                        paddleLeftDirection.Y = WindowHeight - paddleLeftRectangle.Height;
+                    }
+                }
+                //paddleLeftRectangle.Offset(paddleLeftDirection);
+                paddleLeftRectangle.X = (int)paddleLeftDirection.X;
+                paddleLeftRectangle.Y = (int)paddleLeftDirection.Y;
+
+            }
             base.Update(gameTime);
         }
 

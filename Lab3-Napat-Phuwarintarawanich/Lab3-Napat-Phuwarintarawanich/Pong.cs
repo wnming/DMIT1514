@@ -28,7 +28,7 @@ namespace Lab3_Napat_Phuwarintarawanich
 
         private float timeElapsed = 0.0f;
         private float timeToUpdate = 1 / 8.0f;
-        private const int Speed = 60;
+        private const int Speed = 100;
 
         public enum GameState
         {
@@ -57,8 +57,8 @@ namespace Lab3_Napat_Phuwarintarawanich
             paddleRightRectangle = paddleRightTexture.Bounds;
             pongBallRectangle = pongBallTexture.Bounds;
 
-            paddleLeftDirection = new Vector2(5, WindowHeight / 2 - paddleLeftRectangle.Height / 2);
-            paddleRightDirection = new Vector2(WindowWidth - paddleRightRectangle.Width - 5, WindowHeight / 2 - paddleRightRectangle.Height / 2);
+            paddleLeftDirection = new Vector2(10, WindowHeight / 2 - paddleLeftRectangle.Height / 2);
+            paddleRightDirection = new Vector2(WindowWidth - paddleRightRectangle.Width - 10, WindowHeight / 2 - paddleRightRectangle.Height / 2);
             //pongBallDirection = new Vector2(WindowWidth / 2, WindowHeight / 2);
             pongBallDirection = new Vector2(5f, 5f);
 

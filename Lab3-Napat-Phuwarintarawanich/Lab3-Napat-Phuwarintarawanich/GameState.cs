@@ -12,6 +12,7 @@ namespace Lab3_Napat_Phuwarintarawanich
         Start, 
         Serving, //serve a ball
         Playing, //playing until the ball goes off the border
-        GameOver //check player poing and display play again screen
+        BallSticks, //allow ball to stick/not stick to paddle
+        GameOver //display Gameover screen with player point and play again
     }
 }

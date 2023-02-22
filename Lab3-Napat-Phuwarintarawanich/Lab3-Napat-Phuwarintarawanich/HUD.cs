@@ -20,6 +20,12 @@ namespace Lab3_Napat_Phuwarintarawanich
             hudPosition = position;
         }
 
+        internal void Reset()
+        {
+            LeftHit = 0;
+            RightHit = 0;
+        }
+
         internal void LoadContent(ContentManager content)
         {
             hudTexture = content.Load<Texture2D>("HUD-background");

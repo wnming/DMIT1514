@@ -12,8 +12,8 @@ namespace Lab3_Napat_Phuwarintarawanich
 {
     internal class Paddle
     {
-        private const int Speed = 400;
-        private const int WIDTH = 13;
+        internal const int Speed = 400;
+        private const int WIDTH = 10;
         private const int HEIGHT = 135;
 
         protected Texture2D paddleTexture;
@@ -21,7 +21,8 @@ namespace Lab3_Napat_Phuwarintarawanich
 
         private Rectangle gameArea;
 
-        internal bool isHit { get; set; } = false;
+        internal bool IsHit { get; set; } = false;
+        internal bool IsSticky { get; set; } = false;
 
         private Color paddleColor;
         private double elapsedTime = 0;
@@ -50,6 +51,8 @@ namespace Lab3_Napat_Phuwarintarawanich
             this.gameArea = gameArea;
             elapsedTime = 0;
             paddleColor = Color.White;
+            IsSticky = false;
+            IsHit = false;
         }
 
         internal void LoadContent(ContentManager content)
@@ -71,7 +74,7 @@ namespace Lab3_Napat_Phuwarintarawanich
             }
 
             //change paddle's color for 500 milliseconds when they're touched by the ball
-            if (isHit)
+            if (IsHit)
             {
                 paddleColor = Color.MediumVioletRed;
                 elapsedTime += gameTime.ElapsedGameTime.TotalMilliseconds;
@@ -79,7 +82,7 @@ namespace Lab3_Napat_Phuwarintarawanich
                 {
                     paddleColor = Color.White;
                     elapsedTime = 0;
-                    isHit = false;
+                    IsHit = false;
                 }
             }
         }

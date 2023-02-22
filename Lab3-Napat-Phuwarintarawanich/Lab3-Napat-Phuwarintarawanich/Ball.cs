@@ -28,13 +28,18 @@ namespace Lab3_Napat_Phuwarintarawanich
             }
         }
 
+        internal float Distance { get; set; } = 0;
+
+        internal bool IsBallStickLeft { get; set; } = false;
+        internal bool IsBallStickRight { get; set; } = false;
+
         private Texture2D pongBallTexture;
         private Vector2 pongBallDirection;
         private Vector2 pongBallPosition;
 
         private Rectangle gameArea;
 
-        private Rectangle ballRectangle => new Rectangle((int)pongBallPosition.X, (int)pongBallPosition.Y, pongBallTexture.Width, pongBallTexture.Height);
+        internal Rectangle ballRectangle => new Rectangle((int)pongBallPosition.X, (int)pongBallPosition.Y, pongBallTexture.Width, pongBallTexture.Height);
 
 
         internal void Initialize(Vector2 initialPosition, Rectangle area, Vector2 initialDirection)
@@ -43,6 +48,8 @@ namespace Lab3_Napat_Phuwarintarawanich
             pongBallPosition = initialPosition;
             this.gameArea = area;
             Speed = InitialSpeed;
+            IsBallStickLeft = false;
+            IsBallStickRight = false;
         }
 
         internal void LoadContent(ContentManager content)
@@ -65,13 +72,30 @@ namespace Lab3_Napat_Phuwarintarawanich
             spriteBatch.Draw(pongBallTexture, pongBallPosition, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0f);
         }
 
-        internal bool IsCollide(Rectangle paddingRectangle)
+        internal bool IsCollide(Rectangle paddingRectangle, bool isPaddleSticky, string stickSide)
         {
             bool isCollide = false;
             if (paddingRectangle.Intersects(ballRectangle))
             {
-                pongBallDirection.X *= -1;
-                isCollide = true;
+                if (stickSide == "left")
+                {
+                    IsBallStickLeft = isPaddleSticky;
+                }
+                else
+                {
+                    IsBallStickRight = isPaddleSticky;
+                }
+                if (!isPaddleSticky)
+                {
+                    pongBallDirection.X *= -1;
+                    isCollide = true;
+                }
+                else
+                {
+                    pongBallDirection.X = 0;
+                    pongBallDirection.Y = 0;
+                    isCollide = true;
+                }
             }
             return isCollide;
         }
@@ -84,6 +108,63 @@ namespace Lab3_Napat_Phuwarintarawanich
                 isOffBorder = true;
             }
             return isOffBorder;
+        }
+
+        internal void CheckSticky(bool isSticky, Rectangle paddleRectangle, string moveDirection)
+        {
+            if (isSticky && moveDirection == "up")
+            {
+                if (paddleRectangle.Y > 0)
+                {
+                    MoveStickyBall(true, true);
+                }
+                else
+                {
+                    MoveStickyBall(true, false);
+                }
+            }
+            else
+            {
+                if (isSticky && moveDirection == "down")
+                {
+                    if (paddleRectangle.Y < gameArea.Height - paddleRectangle.Height)
+                    {
+                        MoveStickyBall(false, true);
+                    }
+                    else
+                    {
+                        MoveStickyBall(false, false);
+                    }
+                }
+            }
+        }
+
+        internal void MoveStickyBall(bool isMoveUp, bool isMove)
+        {
+            Speed = Paddle.Speed;
+            if (isMoveUp)
+            {
+                pongBallDirection.Y =  pongBallPosition.Y > 0 && isMove ? -1 : 0;
+            }
+            else
+            {
+                pongBallDirection.Y = pongBallPosition.Y < gameArea.Height - pongBallTexture.Height && isMove ? 1 : 0;
+            }
+        }
+
+        internal void ReleaseStickBall()
+        {
+            Speed = InitialSpeed;
+            IsBallStickRight = false;
+            IsBallStickLeft = false;
+            if (pongBallPosition.X > gameArea.Width / 2)
+            {
+                pongBallDirection = new Vector2(-1, 1);
+            }
+            else
+            {
+                pongBallDirection = pongBallDirection = new Vector2(1, 1);
+            }
         }
     }
 }

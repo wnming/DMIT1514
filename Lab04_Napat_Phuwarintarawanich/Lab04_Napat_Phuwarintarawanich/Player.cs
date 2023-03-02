@@ -8,15 +8,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using MosquitoAttack;
+using DMIT.GameObject;
 
 namespace Lab04_Napat_Phuwarintarawanich
 {
-    internal class Player
+    internal class Player: GameObject
     {
+        //Transform transform;
+        //Sprite sprite;
+        Controls playerControls;
+
         private Texture2D playerTexture;
         private Vector2 playerPosition;
         protected Vector2 PlayerDirection { get; set; }
-        Controls playerControls;
 
         //change this
         CelAnimationSequence playerRunning;
@@ -34,13 +38,20 @@ namespace Lab04_Napat_Phuwarintarawanich
 
         PlayerState currentPlayerState = PlayerState.Alive;
 
-        public Player(Texture2D texture, Vector2 initialPosition, Rectangle gameArea, Controls controls) 
+        public Player(Sprite sprite, Transform transform, Controls controls) : base(sprite, transform)
         {
-            playerControls = controls; 
-            playerTexture = texture;
-            playerPosition = initialPosition;
-            this.gameArea = gameArea;
+            this.sprite = sprite;
+            this.transform = transform;
+            this.playerControls = controls;
         }
+
+        //public Player(Texture2D texture, Vector2 initialPosition, Rectangle gameArea, Controls controls) 
+        //{
+        //    playerControls = controls; 
+        //    playerTexture = texture;
+        //    playerPosition = initialPosition;
+        //    this.gameArea = gameArea;
+        //}
 
         //internal void Initialize(Vector2 initialPosition, Rectangle gameArea)
         //{
@@ -84,14 +95,26 @@ namespace Lab04_Napat_Phuwarintarawanich
 
         public void PlayerMove()
         {
-            if (playerControls.positiveDirection)
+            if(playerControls.positiveDirection == playerControls.negativeDirection)
             {
-                //move right
+                transform.Direction = Vector2.Zero;
             }
-            if (playerControls.negativeDirection) 
-            { 
-                //move left
+            else
+            {
+                
             }
+            Move(transform.Direction * playerSpeed);
+
+            //if (playerControls.positiveDirection)
+            //{
+            //    //move right
+            //    Move(transform.Direction * playerSpeed);
+            //}
+            //if (playerControls.negativeDirection) 
+            //{
+            //    //move left
+            //    Move(transform.Direction * playerSpeed);
+            //}
         }
 
         public void PlayerFire()

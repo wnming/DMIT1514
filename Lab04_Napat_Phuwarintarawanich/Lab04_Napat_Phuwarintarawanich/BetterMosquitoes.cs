@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using DMIT.GameObject;
 
 namespace Lab04_Napat_Phuwarintarawanich
 {
@@ -19,6 +20,10 @@ namespace Lab04_Napat_Phuwarintarawanich
 
         Player playerOne;
         Controls playerControls;
+
+        //GameObject testObject;
+        Sprite testSprite;
+        Transform testTransform;
 
         public BetterMosquitoes()
         {
@@ -40,7 +45,12 @@ namespace Lab04_Napat_Phuwarintarawanich
 
             base.Initialize();
 
-            playerOne = new Player(playerTexture, new Rectangle(0, 0, WindowWidth, WindowHeight - 10).Center.ToVector2(), gameArea, playerControls);
+            //playerOne = new Player(playerTexture, new Rectangle(0, 0, WindowWidth, WindowHeight - 10).Center.ToVector2(), gameArea, playerControls);
+
+            //test gamobj
+            testTransform = new Transform();
+            testSprite = new Sprite(playerTexture, playerTexture.Bounds, 1, new Rectangle(0, 0, 500, 500));
+            //testObject = new GameObject(testSprite, testTransform);
         }
 
         protected override void LoadContent()
@@ -59,6 +69,7 @@ namespace Lab04_Napat_Phuwarintarawanich
                 Exit();
 
             // TODO: Add your update logic here
+            testObject.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -70,6 +81,7 @@ namespace Lab04_Napat_Phuwarintarawanich
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
             _spriteBatch.Draw(background, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
+            testObject.Draw(_spriteBatch);
             _spriteBatch.End();
 
             base.Draw(gameTime);

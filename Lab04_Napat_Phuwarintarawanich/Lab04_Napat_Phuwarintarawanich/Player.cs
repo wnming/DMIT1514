@@ -9,18 +9,19 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using MosquitoAttack;
 using DMIT.GameObject;
+using Microsoft.Xna.Framework.Input;
 
 namespace Lab04_Napat_Phuwarintarawanich
 {
     internal class Player: GameObject
     {
-        //Transform transform;
-        //Sprite sprite;
+        Transform transform;
+        Sprite sprite;
         Controls playerControls;
 
-        private Texture2D playerTexture;
-        private Vector2 playerPosition;
-        protected Vector2 PlayerDirection { get; set; }
+        //private Texture2D playerTexture;
+        //private Vector2 playerPosition;
+        //protected Vector2 PlayerDirection { get; set; }
 
         //change this
         CelAnimationSequence playerRunning;
@@ -28,13 +29,15 @@ namespace Lab04_Napat_Phuwarintarawanich
 
         private Rectangle gameArea;
 
-        float playerSpeed = 400;
+        float playerSpeed = 4f;
         int maxPlayerHealth;
         int currentPlayerHealth;
 
         int maxPlayerAmmo;
         int currentPlayerAmmo;
         float fireRate;
+
+        bool leftPressed, rightPressed, firePressed;
 
         PlayerState currentPlayerState = PlayerState.Alive;
 
@@ -70,17 +73,17 @@ namespace Lab04_Napat_Phuwarintarawanich
             {
                 case PlayerState.Alive:
                     //change this
-                    playerPosition += playerSpeed * PlayerDirection * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    //transform.Position += playerSpeed * transform.Direction * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-                    if (playerPosition.X >= gameArea.Right - playerTexture.Height)
-                    {
-                        playerPosition.X = gameArea.Right - playerTexture.Height;
-                    }
-                    if (playerPosition.X <= gameArea.Left)
-                    {
-                        playerPosition.X = 0;
-                    }
-
+                    //if (playerPosition.X >= gameArea.Right - playerTexture.Height)
+                    //{
+                    //    playerPosition.X = gameArea.Right - playerTexture.Height;
+                    //}
+                    //if (playerPosition.X <= gameArea.Left)
+                    //{
+                    //    playerPosition.X = 0;
+                    //}
+                    PlayerInput(playerControls);
                     PlayerMove();
                     PlayerFire();
                     break;
@@ -93,15 +96,34 @@ namespace Lab04_Napat_Phuwarintarawanich
             }
         }
 
+        public void PlayerInput(Controls controls)
+        {
+            rightPressed = Keyboard.GetState().IsKeyDown(controls.positiveDirection);
+            leftPressed = Keyboard.GetState().IsKeyDown(controls.negativeDirection);
+            firePressed = Keyboard.GetState().IsKeyDown(controls.wasFirePressedThisFrame);
+        }
+
         public void PlayerMove()
         {
-            if(playerControls.positiveDirection == playerControls.negativeDirection)
+            if(leftPressed)
             {
-                transform.Direction = Vector2.Zero;
+                transform.Direction = new Vector2(-1, 0);
+                //transform.Direction = Vector2.Zero;
             }
             else
             {
-                
+                if(rightPressed)
+                {
+                    transform.Direction = new Vector2(1, 0);
+                }
+                else
+                {
+                    transform.Direction = Vector2.Zero;
+                }
+                //else
+                //{
+                //    transform.Direction = new Vector2(-1, 0);
+                //}
             }
             Move(transform.Direction * playerSpeed);
 
@@ -119,30 +141,47 @@ namespace Lab04_Napat_Phuwarintarawanich
 
         public void PlayerFire()
         {
-            if (playerControls.wasFirePressedThisFrame)
-            {
+            //if (playerControls.wasFirePressedThisFrame)
+            //{
 
-            }
+            //}
         }
 
         internal void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(playerTexture, playerPosition, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0f);
+            spriteBatch.Draw(sprite.SpriteSheet, transform.Position, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0f);
         }
     }
 
     internal struct Controls
     {
-        public Controls(bool pos, bool neg, bool fire) 
-        { 
-            positiveDirection = pos;
-            negativeDirection = neg;
-            wasFirePressedThisFrame = fire;
+        //public Controls(bool pos, bool neg, bool fire) 
+        //{ 
+        //    positiveDirection = pos;
+        //    negativeDirection = neg;
+        //    wasFirePressedThisFrame = fire;
+        //}
+
+        public Controls(Keys pos, Keys neg, Keys fire)
+        {
+            this.positiveDirection = pos;
+            this.negativeDirection = neg;
+            this.wasFirePressedThisFrame = fire;
         }
-        public bool positiveDirection;
-        public bool negativeDirection;
-        public bool wasFirePressedThisFrame;
+
+        //public bool positiveDirection;
+        //public bool negativeDirection;
+        //public bool wasFirePressedThisFrame;
+
+        public Keys positiveDirection;
+        public Keys negativeDirection;
+        public Keys wasFirePressedThisFrame;
     }
+
+    //public struct InputRef
+    //{
+
+    //}
 
     public enum PlayerUpgradeState
     {

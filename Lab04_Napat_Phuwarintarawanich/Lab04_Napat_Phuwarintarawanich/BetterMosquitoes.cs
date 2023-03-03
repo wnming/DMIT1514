@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using DMIT.GameObject;
+using System.Collections.Generic;
 
 namespace Lab04_Napat_Phuwarintarawanich
 {
@@ -21,9 +22,11 @@ namespace Lab04_Napat_Phuwarintarawanich
         Player playerOne;
         Controls playerControls;
 
-        //GameObject testObject;
+        GameObject testObject;
         Sprite testSprite;
         Transform testTransform;
+        List<Player> playerList = new List<Player>();
+        List<Controls> playerControlList = new List<Controls>();
 
         public BetterMosquitoes()
         {
@@ -39,9 +42,14 @@ namespace Lab04_Napat_Phuwarintarawanich
             // TODO: Add your initialization logic here
             gameArea = new Rectangle(0, 0, WindowWidth, WindowHeight);
             //change to keyboard stuff
-            playerControls = new Controls(GamePad.GetState(0).DPad.Right == ButtonState.Pressed,
-                GamePad.GetState(0).DPad.Left == ButtonState.Pressed, 
-                GamePad.GetState(0).Buttons.A == ButtonState.Pressed);
+            //playerControls = new Controls(GamePad.GetState(0).DPad.Right == ButtonState.Pressed,
+            //    GamePad.GetState(0).DPad.Left == ButtonState.Pressed, 
+            //    GamePad.GetState(0).Buttons.A == ButtonState.Pressed);
+            playerControls = new Controls(Keys.Right, Keys.Left, Keys.Space);
+            //playerControlList.Add(new Controls(Keys.D, Keys.A, Keys.Space));
+            //playerControlList.Add(new Controls(Keys.Right, Keys.Left, Keys.Space));
+            //playerControlList.Add(new Controls(Keys.B, Keys.M, Keys.Space));
+
 
             base.Initialize();
 
@@ -50,6 +58,13 @@ namespace Lab04_Napat_Phuwarintarawanich
             //test gamobj
             testTransform = new Transform();
             testSprite = new Sprite(playerTexture, playerTexture.Bounds, 1, new Rectangle(0, 0, 500, 500));
+            for(int i = 0; i < 3; i++)
+            {
+                //Player newPlayer = new Player(testSprite, new Transform(new (0, 128 * i), Vector2.Zero, 0, 0), playerControls);
+                Player newPlayer = new Player(testSprite, testTransform, playerControls);
+                newPlayer.transform.TranslatePosition(new Vector2(0, i * 155));
+                playerList.Add(newPlayer);
+            }
             //testObject = new GameObject(testSprite, testTransform);
         }
 
@@ -69,7 +84,12 @@ namespace Lab04_Napat_Phuwarintarawanich
                 Exit();
 
             // TODO: Add your update logic here
-            testObject.Update(gameTime);
+            //testObject.Update(gameTime);
+            foreach(Player player in playerList)
+            {
+                //player.transform.TranslatePosition(new Vector2(1, 0));
+                player.Update(gameTime);
+            }
 
             base.Update(gameTime);
         }
@@ -81,7 +101,11 @@ namespace Lab04_Napat_Phuwarintarawanich
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
             _spriteBatch.Draw(background, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
-            testObject.Draw(_spriteBatch);
+            //testObject.Draw(_spriteBatch);
+            foreach (Player player in playerList)
+            {
+                player.Draw(_spriteBatch);
+            }
             _spriteBatch.End();
 
             base.Draw(gameTime);

@@ -28,6 +28,7 @@ namespace DMIT.GameObject
 
         public void Move(Vector2 offset)
         {
+            //check bounds
             transform.TranslatePosition(offset);
             sprite.UpdateBounds(transform);
         }
@@ -48,20 +49,18 @@ namespace DMIT.GameObject
         public Vector2 Position;
         public Vector2 Direction;
         public float Rotation;
-        public float Scale;
 
-        public Transform(Vector2 position, Vector2 direction, float rotation, float scale)
+        public Transform(Vector2 position, Vector2 direction, float rotation)
         {
             this.Position = position;
             this.Direction = direction;
             this.Rotation = rotation;
-            this.Scale = scale;
         }
 
-        public bool CheckBounds(Sprite sprite)
-        {
-            return sprite.Bounds.X > sprite.GameArea.Width || sprite.Bounds.X < 0 || sprite.Bounds.Y < 0 || sprite.Bounds.Y > sprite.GameArea.Height;
-        }
+        //public bool CheckBounds(Sprite sprite)
+        //{
+        //    return sprite.Bounds.X > sprite.GameArea.Width || sprite.Bounds.X < 0 || sprite.Bounds.Y < 0 || sprite.Bounds.Y > sprite.GameArea.Height;
+        //}
 
         public void TranslatePosition(Vector2 offsetVector)
         {

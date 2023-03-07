@@ -8,15 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using MosquitoAttack;
-using DMIT.GameObject;
 using Microsoft.Xna.Framework.Input;
 
 namespace Lab04_Napat_Phuwarintarawanich
 {
-    internal class Player: GameObject
+    public class Player: GameObject
     {
-        Transform transform;
-        Sprite sprite;
+        public Transform transform;
+        public Sprite sprite;
         Controls playerControls;
 
         //private Texture2D playerTexture;
@@ -45,7 +44,7 @@ namespace Lab04_Napat_Phuwarintarawanich
         {
             this.sprite = sprite;
             this.transform = transform;
-            this.playerControls = controls;
+            playerControls = controls;
         }
 
         //public Player(Texture2D texture, Vector2 initialPosition, Rectangle gameArea, Controls controls) 
@@ -153,7 +152,7 @@ namespace Lab04_Napat_Phuwarintarawanich
         }
     }
 
-    internal struct Controls
+    public struct Controls
     {
         //public Controls(bool pos, bool neg, bool fire) 
         //{ 

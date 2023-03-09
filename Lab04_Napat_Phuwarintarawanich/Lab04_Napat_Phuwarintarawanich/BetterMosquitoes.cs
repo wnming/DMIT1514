@@ -26,6 +26,8 @@ namespace Lab04_Napat_Phuwarintarawanich
         Transform testTransform;
         List<Player> playerList = new List<Player>();
         List<Controls> playerControlList = new List<Controls>();
+        List<PlayerBullet> playerBulletList = new();
+        List<Enemy> enemyList = new();
 
         public BetterMosquitoes()
         {
@@ -56,7 +58,7 @@ namespace Lab04_Napat_Phuwarintarawanich
 
             //test gamobj
             testTransform = new Transform();
-            testSprite = new Sprite(playerTexture, playerTexture.Bounds, 1, new Rectangle(0, 0, 500, 500));
+            testSprite = new Sprite(playerTexture, playerTexture.Bounds, 1, gameArea);
             for(int i = 0; i < 3; i++)
             {
                 //Player newPlayer = new Player(testSprite, new Transform(new (0, 128 * i), Vector2.Zero, 0, 0), playerControls);
@@ -88,6 +90,18 @@ namespace Lab04_Napat_Phuwarintarawanich
             {
                 //player.transform.TranslatePosition(new Vector2(1, 0));
                 player.Update(gameTime);
+            }
+
+            foreach(PlayerBullet bullet in playerBulletList)
+            {
+                if(bullet.playerBulletState == ProjectileState.Flying)
+                {
+                    bullet.Update(gameTime);
+                    //if (bullet.sprite.Bounds.Intersect(enemyList[0].sprite.Bounds))
+                    //{
+                    //    bullet.playerBulletState = ProjectileState.NotFlying;
+                    //}
+                }
             }
 
             base.Update(gameTime);

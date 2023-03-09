@@ -19,10 +19,10 @@ public class GameObject
         return sprite.Bounds.Intersects(otherBounds);
     }
 
-    public void TranslatePosition(Vector2 offsetVector)
-    {
-        transform.Position = new Vector2(transform.Position.X + offsetVector.X, transform.Position.Y + offsetVector.Y);
-    }
+    //public void TranslatePosition(Vector2 offsetVector)
+    //{
+    //    transform.Position = new Vector2(transform.Position.X + offsetVector.X, transform.Position.Y + offsetVector.Y);
+    //}
 
     public void Move(Vector2 offset)
     {
@@ -42,11 +42,16 @@ public class GameObject
     }
 }
 
-public class Transform
+public struct Transform
 {
     public Vector2 Position;
     public Vector2 Direction;
     public float Rotation;
+
+    public void TranslatePosition(Vector2 offsetVector)
+    {
+        Position += offsetVector;
+    }
 
     public Transform(Vector2 position, Vector2 direction, float rotation)
     {
@@ -59,15 +64,6 @@ public class Transform
     //{
     //    return sprite.Bounds.X > sprite.GameArea.Width || sprite.Bounds.X < 0 || sprite.Bounds.Y < 0 || sprite.Bounds.Y > sprite.GameArea.Height;
     //}
-
-    public void TranslatePosition(Vector2 offsetVector)
-    {
-        Position += offsetVector;
-    }
-
-    public Transform()
-    {
-    }
 }
 
 public struct Sprite

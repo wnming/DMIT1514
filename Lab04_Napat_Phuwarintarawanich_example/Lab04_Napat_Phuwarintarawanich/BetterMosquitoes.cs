@@ -63,7 +63,7 @@ namespace Lab04_Napat_Phuwarintarawanich
             {
                 //Player newPlayer = new Player(testSprite, new Transform(new (0, 128 * i), Vector2.Zero, 0, 0), playerControls);
                 Player newPlayer = new Player(testSprite, testTransform, playerControls);
-                newPlayer.transform.TranslatePosition(new Vector2(0, i * 128));
+                newPlayer.transform.TranslatePosition(new Vector2(0, i * 156));
                 playerList.Add(newPlayer);
             }
             //testObject = new GameObject(testSprite, testTransform);

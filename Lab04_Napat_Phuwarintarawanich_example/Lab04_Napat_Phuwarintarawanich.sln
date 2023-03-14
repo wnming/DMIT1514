@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterMosquitoes", "BetterMosquitoes\BetterMosquitoes.csproj", "{6305C8A1-9040-4C5F-ABEB-7E68A10F0D5D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab04_Napat_Phuwarintarawanich", "Lab04_Napat_Phuwarintarawanich\Lab04_Napat_Phuwarintarawanich.csproj", "{1A82822D-FD39-4AFD-B38A-A9D8D8CEB1DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6305C8A1-9040-4C5F-ABEB-7E68A10F0D5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6305C8A1-9040-4C5F-ABEB-7E68A10F0D5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6305C8A1-9040-4C5F-ABEB-7E68A10F0D5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6305C8A1-9040-4C5F-ABEB-7E68A10F0D5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A82822D-FD39-4AFD-B38A-A9D8D8CEB1DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A82822D-FD39-4AFD-B38A-A9D8D8CEB1DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A82822D-FD39-4AFD-B38A-A9D8D8CEB1DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A82822D-FD39-4AFD-B38A-A9D8D8CEB1DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {43DC71F3-DB8D-444E-9B52-8DE733C9403B}
+		SolutionGuid = {D5940195-EBD1-46F2-82F4-ACF2FCC3D22F}
 	EndGlobalSection
 EndGlobal

@@ -12,6 +12,8 @@ namespace BetterMosquitoes
         const int WindowWidth = 800;
         const int WindowHeight = 550;
 
+        private Rectangle gameArea;
+
         private Texture2D background;
 
         public BetterMosquitoes()
@@ -26,6 +28,7 @@ namespace BetterMosquitoes
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            gameArea = new Rectangle(0, 0, WindowWidth, WindowHeight);
 
             base.Initialize();
         }

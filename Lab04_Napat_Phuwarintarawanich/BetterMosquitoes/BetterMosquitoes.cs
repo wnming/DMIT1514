@@ -16,6 +16,9 @@ namespace BetterMosquitoes
 
         private Texture2D background;
 
+        //test
+        private Texture2D player;
+
         public BetterMosquitoes()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -39,6 +42,7 @@ namespace BetterMosquitoes
 
             // TODO: use this.Content to load your game content here
             background = Content.Load<Texture2D>("Background");
+            player = Content.Load<Texture2D>("player");
         }
 
         protected override void Update(GameTime gameTime)
@@ -58,6 +62,7 @@ namespace BetterMosquitoes
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
             _spriteBatch.Draw(background, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
+            _spriteBatch.Draw(player, new Vector2(200,450), Color.White);
             _spriteBatch.End();
 
 

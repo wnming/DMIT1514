@@ -1,0 +1,9 @@
+(Done) 1. Add states to the game. The player should see a start screen, then play the game, then a game over screen that gives them the option to play again. The game states could be START, INITIALIZING, SERVING, PLAYING, GAMEOVER.
+(Done) 2. Make actual Pong. Add another paddle to the other side, controlled by different keys. In implementing this, reuse the Paddle class (do NOT write another class). When the ball hits either side, it should exit the screen and the game should end.
+(Done) 3. Add a HUD to the game that keeps track of how many times each paddle has hit the ball, as well as the high score for the session.
+(Done) 4. When the game begins, have the ball sit in the middle of the screen for a period of time before being "served".
+(Done) 5.  Add the ability to speed up or slow down the ball by pressing a button.
+(Done) 6. Make the paddle(s) turn a different colour for 500 milliseconds when they are touched by the ball.
+(Done) 7. Add another ball to the game. The balls don't have to react when they hit each other (they can just pass through each other).
+(Done) 8. Make a game state in which the ball sticks to the paddle. The state should be toggled on and off by a key.
+For No. 8, I have the ball sticks to the paddle in the Playing state, and I can't seem to have the BallSticks state itself because there are two balls, and when one attaches to the paddle while another is still playing, another ball needs to be in Playing.

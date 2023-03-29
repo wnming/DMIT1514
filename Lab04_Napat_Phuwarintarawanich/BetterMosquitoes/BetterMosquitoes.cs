@@ -1,6 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Lesson05_Animations;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace BetterMosquitoes
 {
@@ -16,8 +18,14 @@ namespace BetterMosquitoes
 
         private Texture2D background;
 
-        //test
-        private Texture2D player;
+        Player GamePlayer;
+        PlayerControls PlayerControl;
+        Sprite PlayerSprite;
+        Texture2D PlayerSpriteSheet;
+
+        List<Enemy> EnemyList = new();
+        Sprite EnemySprite;
+        Texture2D EnemySpriteSheet;
 
         public BetterMosquitoes()
         {
@@ -26,14 +34,30 @@ namespace BetterMosquitoes
             _graphics.PreferredBackBufferHeight = WindowHeight;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            //playerDirection = new Vector2(200, 440);
+            //enemyDirection = new Vector2(5, 5);
         }
 
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
             gameArea = new Rectangle(0, 0, WindowWidth, WindowHeight);
+            PlayerControl = new PlayerControls(Keys.Right, Keys.Left, Keys.Space);
 
             base.Initialize();
+
+            PlayerSprite = new Sprite(PlayerSpriteSheet, PlayerSpriteSheet.Bounds, 108, 108, 6, 1);
+            GamePlayer = new Player(PlayerSprite, new ObjectTransform(), PlayerControl, gameArea);
+            GamePlayer.Transform.TranslatePosition(new Vector2(200, 440));
+
+            EnemySprite = new Sprite(EnemySpriteSheet, EnemySpriteSheet.Bounds, 63, 53, 5, 1);
+            for (int i = 0; i < 5; i++)
+            {
+                Enemy newEnemy = new Enemy(EnemySprite, new ObjectTransform());
+                newEnemy.Transform.TranslatePosition(new Vector2(i * 60, 5));
+                EnemyList.Add(newEnemy);
+            }
         }
 
         protected override void LoadContent()
@@ -42,7 +66,20 @@ namespace BetterMosquitoes
 
             // TODO: use this.Content to load your game content here
             background = Content.Load<Texture2D>("Background");
-            player = Content.Load<Texture2D>("player");
+
+            PlayerSpriteSheet = Content.Load<Texture2D>("player");
+            EnemySpriteSheet = Content.Load<Texture2D>("jellyfish-enemy");
+            //player = new CelAnimationSequence(playerSpriteSheet, 108, 108, 1 / 9f, 6, 1);
+
+            //playerAnimation = new CelAnimationPlayer();
+            //playerAnimation.Play(player);
+
+            //Texture2D enemySpriteSheet = Content.Load<Texture2D>("jellyfish-enemy");
+            //enemy = new CelAnimationSequence(enemySpriteSheet, 63, 53, 1 / 9f, 5, 1);
+
+            //enemyAnimation = new CelAnimationPlayer();
+            //enemyAnimation.Play(enemy);
+
         }
 
         protected override void Update(GameTime gameTime)
@@ -51,6 +88,16 @@ namespace BetterMosquitoes
                 Exit();
 
             // TODO: Add your update logic here
+
+            GamePlayer.Update(gameTime);
+
+            foreach(Enemy enemy in EnemyList)
+            {
+                enemy.Update(gameTime);
+            }
+
+            //playerAnimation.Update(gameTime);
+            //enemyAnimation.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -62,7 +109,13 @@ namespace BetterMosquitoes
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
             _spriteBatch.Draw(background, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
-            _spriteBatch.Draw(player, new Vector2(200,450), Color.White);
+            GamePlayer.Draw(_spriteBatch);
+            foreach(Enemy enemy in EnemyList)
+            {
+                enemy.Draw(_spriteBatch);
+            }
+            //playerAnimation.Draw(_spriteBatch, playerDirection, SpriteEffects.None);
+            //enemyAnimation.Draw(_spriteBatch, enemyDirection, SpriteEffects.None);
             _spriteBatch.End();
 
 

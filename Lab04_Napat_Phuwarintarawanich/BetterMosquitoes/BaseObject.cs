@@ -50,11 +50,11 @@ namespace BetterMosquitoes
         public CelAnimationSequence AnimationSequence;
         public CelAnimationPlayer AnimationPlayer = new CelAnimationPlayer();
 
-        public Sprite(Texture2D spriteSheet, Rectangle spriteBounds, int CelHeight, int CelWidth, int CelRow, int CelCount)
+        public Sprite(Texture2D spriteSheet, Rectangle spriteBounds, int CelHeight, int CelWidth, float CelTime, int CelRow, int CelCount)
         {
             SpriteSheet = spriteSheet;
             SpriteBounds = spriteBounds;
-            AnimationSequence = new CelAnimationSequence(spriteSheet, CelHeight, CelWidth, 1 / 9f, CelRow, CelCount);
+            AnimationSequence = new CelAnimationSequence(spriteSheet, CelHeight, CelWidth, CelTime, CelRow, CelCount);
             AnimationPlayer.Play(AnimationSequence);
         }
 
@@ -77,18 +77,16 @@ namespace BetterMosquitoes
     {
         public Vector2 Position;
         public Vector2 Direction;
-        //public float Rotation;
 
         public void TranslatePosition(Vector2 offsetVector)
         {
             Position += offsetVector;
         }
 
-        public ObjectTransform(Vector2 position, Vector2 direction, float rotation)
+        public ObjectTransform(Vector2 position, Vector2 direction)
         {
-            this.Position = position;
-            this.Direction = direction;
-            //this.Rotation = rotation;
+            Position = position;
+            Direction = direction;
         }
     }
 }

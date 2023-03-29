@@ -47,12 +47,12 @@ namespace BetterMosquitoes
 
             base.Initialize();
 
-            PlayerSprite = new Sprite(PlayerSpriteSheet, PlayerSpriteSheet.Bounds, 108, 108, 6, 1);
+            PlayerSprite = new Sprite(PlayerSpriteSheet, PlayerSpriteSheet.Bounds, 108, 108, 1 / 7f, 6, 1);
             GamePlayer = new Player(PlayerSprite, new ObjectTransform(), PlayerControl, gameArea);
             GamePlayer.Transform.TranslatePosition(new Vector2(200, 440));
 
-            EnemySprite = new Sprite(EnemySpriteSheet, EnemySpriteSheet.Bounds, 63, 53, 5, 1);
-            for (int i = 0; i < 5; i++)
+            EnemySprite = new Sprite(EnemySpriteSheet, EnemySpriteSheet.Bounds, 63, 53, 1 / 0.9f, 5, 1);
+            for (int i = 0; i < 8; i++)
             {
                 Enemy newEnemy = new Enemy(EnemySprite, new ObjectTransform());
                 newEnemy.Transform.TranslatePosition(new Vector2(i * 60, 5));

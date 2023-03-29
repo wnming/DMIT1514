@@ -15,9 +15,9 @@ namespace BetterMosquitoes
         EnemyState currentEnemyState = EnemyState.Alive;
 
         private int Movement = 0;
-        private int EnemyMovement = 20;
+        private int EnemyMovement = 13;
         private float Timer = 0;
-        private float Speed = 1f;
+        private float Speed = 0.9f;
         private float MoveTime = 0.5f;
 
         public Enemy(Sprite sprite, ObjectTransform transform) : base(sprite, transform)
@@ -48,7 +48,7 @@ namespace BetterMosquitoes
             if (Movement == EnemyMovement)
             {
                 Transform.Direction = new Vector2(0, 1);
-                Movement = -1;
+                Movement = 0;
                 Speed = -Speed;
                 Timer = 0;
             }

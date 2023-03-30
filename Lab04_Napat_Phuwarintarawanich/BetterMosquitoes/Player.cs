@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BetterMosquitoes
 {
-    public class Player: BaseObject
+    public class Player : BaseObject
     {
         ObjectTransform Transform;
         Sprite SpriteSheet;
@@ -21,12 +23,25 @@ namespace BetterMosquitoes
 
         private bool leftPressed, rightPressed, firePressed;
 
+        private List<PlayerBullet> PlayerBulletsList = new();
+
+        Texture2D playerbulletTexture;
+        Sprite bulletSprite;
+
+        float cooldowntime = 0;
+
         public Player(Sprite sprite, ObjectTransform transform, PlayerControls controls, Rectangle gameArea) : base(sprite, transform)
         {
             Transform = transform;
             SpriteSheet = sprite;
             Controls = controls;
             GameArea = gameArea;
+        }
+
+        public void LoadContent(ContentManager content)
+        {
+            playerbulletTexture = content.Load<Texture2D>("octopus_ink");
+            bulletSprite = new Sprite(playerbulletTexture, playerbulletTexture.Bounds, 20, 20, 0, 1, 1);
         }
 
         public void Update(GameTime gameTime)
@@ -37,7 +52,7 @@ namespace BetterMosquitoes
                     SpriteSheet.Update(gameTime);
                     PlayerInput(Controls);
                     PlayerMove();
-                    //PlayerFire();
+                    PlayerShoot(gameTime);
                     break;
                 case PlayerState.Dying:
                     break;
@@ -45,6 +60,10 @@ namespace BetterMosquitoes
                     break;
                 default:
                     break;
+            }
+            foreach (PlayerBullet bullet in PlayerBulletsList)
+            {
+                bullet.Update(gameTime);
             }
         }
 
@@ -60,7 +79,7 @@ namespace BetterMosquitoes
             if (leftPressed)
             {
                 Transform.Direction = new Vector2(-1, 0);
-                if(base.Transform.Position.X < GameArea.Left)
+                if (base.Transform.Position.X < GameArea.Left)
                 {
                     Transform.Direction = Vector2.Zero;
                 }
@@ -82,6 +101,40 @@ namespace BetterMosquitoes
                 }
             }
             Move(Transform.Direction * Speed);
+        }
+
+        void PlayerShoot(GameTime gameTime)
+        {
+            cooldowntime += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            if (firePressed && cooldowntime >= 400)
+            {
+                bool fire = false;
+                //if (!isRest)
+                //{
+
+                //}
+                PlayerBullet newBullet = new PlayerBullet(bulletSprite, new ObjectTransform());
+                fire = newBullet.Fire(base.Transform.Position);
+                PlayerBulletsList.Add(newBullet);
+                cooldowntime = 0;
+            }
+        }
+
+        public void DrawBullet(SpriteBatch spriteBatch)
+        {
+            switch (currentPlayerState)
+            {
+                case PlayerState.Alive:
+                    break;
+                case PlayerState.Dying:
+                    break;
+                case PlayerState.Dead:
+                    break;
+            }
+            foreach (PlayerBullet bullet in PlayerBulletsList)
+            {
+                 bullet.Draw(spriteBatch);
+            }
         }
     }
 

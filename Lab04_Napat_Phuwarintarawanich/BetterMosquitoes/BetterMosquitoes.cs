@@ -23,6 +23,9 @@ namespace BetterMosquitoes
         Sprite PlayerSprite;
         Texture2D PlayerSpriteSheet;
 
+        private const int numberOfEnemy = 16;
+        private int enemyRow = 2;
+        private int initialYPosition = 5;
         List<Enemy> EnemyList = new();
         Sprite EnemySprite;
         Texture2D EnemySpriteSheet;
@@ -50,13 +53,21 @@ namespace BetterMosquitoes
             PlayerSprite = new Sprite(PlayerSpriteSheet, PlayerSpriteSheet.Bounds, 108, 108, 1 / 7f, 6, 1);
             GamePlayer = new Player(PlayerSprite, new ObjectTransform(), PlayerControl, gameArea);
             GamePlayer.Transform.TranslatePosition(new Vector2(200, 440));
+            GamePlayer.LoadContent(Content);
 
-            EnemySprite = new Sprite(EnemySpriteSheet, EnemySpriteSheet.Bounds, 63, 53, 1 / 0.9f, 5, 1);
-            for (int i = 0; i < 8; i++)
+            EnemySprite = new Sprite(EnemySpriteSheet, EnemySpriteSheet.Bounds, 63, 53, 1 / 0.5f, 5, 1);
+            int numberOfEnemyPerRow = numberOfEnemy / enemyRow;
+            while (enemyRow > 0)
             {
-                Enemy newEnemy = new Enemy(EnemySprite, new ObjectTransform());
-                newEnemy.Transform.TranslatePosition(new Vector2(i * 60, 5));
-                EnemyList.Add(newEnemy);
+                for (int i = 0; i < numberOfEnemyPerRow; i++)
+                {
+                    Enemy newEnemy = new Enemy(EnemySprite, new ObjectTransform());
+                    newEnemy.Transform.TranslatePosition(new Vector2(i * 60, initialYPosition));
+                    newEnemy.LoadContent(Content);
+                    EnemyList.Add(newEnemy);
+                }
+                initialYPosition += 70;
+                enemyRow -= 1;
             }
         }
 
@@ -69,6 +80,7 @@ namespace BetterMosquitoes
 
             PlayerSpriteSheet = Content.Load<Texture2D>("player");
             EnemySpriteSheet = Content.Load<Texture2D>("jellyfish-enemy");
+
             //player = new CelAnimationSequence(playerSpriteSheet, 108, 108, 1 / 9f, 6, 1);
 
             //playerAnimation = new CelAnimationPlayer();
@@ -91,7 +103,7 @@ namespace BetterMosquitoes
 
             GamePlayer.Update(gameTime);
 
-            foreach(Enemy enemy in EnemyList)
+            foreach (Enemy enemy in EnemyList)
             {
                 enemy.Update(gameTime);
             }
@@ -110,9 +122,11 @@ namespace BetterMosquitoes
             _spriteBatch.Begin();
             _spriteBatch.Draw(background, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
             GamePlayer.Draw(_spriteBatch);
-            foreach(Enemy enemy in EnemyList)
+            GamePlayer.DrawBullet(_spriteBatch);
+            foreach (Enemy enemy in EnemyList)
             {
                 enemy.Draw(_spriteBatch);
+                enemy.DrawEnemyBullet(_spriteBatch);
             }
             //playerAnimation.Draw(_spriteBatch, playerDirection, SpriteEffects.None);
             //enemyAnimation.Draw(_spriteBatch, enemyDirection, SpriteEffects.None);
@@ -121,5 +135,10 @@ namespace BetterMosquitoes
 
             base.Draw(gameTime);
         }
+    }
+    public enum BulletState
+    {
+        NotFlying,
+        Flying
     }
 }

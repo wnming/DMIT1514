@@ -60,5 +60,13 @@ namespace BetterMosquitoes
             }
             return fire;
         }
+
+        public void Collide()
+        {
+            if(CurrentBulletState == BulletState.Flying)
+            {
+                CurrentBulletState = BulletState.NotFlying;
+            }
+        }
     }
 }

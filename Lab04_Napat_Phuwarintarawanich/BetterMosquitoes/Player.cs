@@ -41,7 +41,7 @@ namespace BetterMosquitoes
         public void LoadContent(ContentManager content)
         {
             playerbulletTexture = content.Load<Texture2D>("octopus_ink");
-            bulletSprite = new Sprite(playerbulletTexture, playerbulletTexture.Bounds, 20, 20, 0, 1, 1);
+            bulletSprite = new Sprite(playerbulletTexture, playerbulletTexture.Bounds, 26, 5, 0, 1, 1);
         }
 
         public void Update(GameTime gameTime)
@@ -118,6 +118,30 @@ namespace BetterMosquitoes
                 PlayerBulletsList.Add(newBullet);
                 cooldowntime = 0;
             }
+        }
+
+        public bool CheckBulletCollision(Rectangle enemyBound)
+        {
+            bool isCollide = false;
+            foreach(PlayerBullet bullet in PlayerBulletsList)
+            {
+                if (bullet.IsCollide(enemyBound))
+                {
+                    bullet.Collide();
+                    isCollide = true;
+                }
+            }
+            return isCollide;
+        }
+
+        public void CheckPlayerCollision()
+        {
+
+        }
+
+        void PlayerDie()
+        {
+            currentPlayerState = PlayerState.Dead;
         }
 
         public void DrawBullet(SpriteBatch spriteBatch)

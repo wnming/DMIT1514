@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 
 namespace BetterMosquitoes
 {
-    public class Enemy: BaseObject
+    public class Enemy : BaseObject
     {
         ObjectTransform Transform;
         Sprite SpriteSheet;
 
         EnemyState currentEnemyState = EnemyState.Alive;
+
+        public EnemyState CurrentEnemyState { get => currentEnemyState; }
 
         private int Movement = 0;
         private int EnemyMovement = 13;
@@ -103,6 +105,11 @@ namespace BetterMosquitoes
                 EnemyBulletsList.Add(newBullet);
                 cooldowntime = 0;
             }
+        }
+
+        public void EnemyDie()
+        {
+            currentEnemyState = EnemyState.Dead;
         }
 
         public void DrawEnemyBullet(SpriteBatch spriteBatch)

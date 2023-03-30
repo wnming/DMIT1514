@@ -55,7 +55,7 @@ namespace BetterMosquitoes
             GamePlayer.Transform.TranslatePosition(new Vector2(200, 440));
             GamePlayer.LoadContent(Content);
 
-            EnemySprite = new Sprite(EnemySpriteSheet, EnemySpriteSheet.Bounds, 63, 53, 1 / 0.5f, 5, 1);
+            EnemySprite = new Sprite(EnemySpriteSheet, new Rectangle(0, 0, EnemySpriteSheet.Bounds.Width / 5, EnemySpriteSheet.Bounds.Height), 63, 53, 1 / 0.5f, 5, 1);
             int numberOfEnemyPerRow = numberOfEnemy / enemyRow;
             while (enemyRow > 0)
             {
@@ -106,10 +106,11 @@ namespace BetterMosquitoes
             foreach (Enemy enemy in EnemyList)
             {
                 enemy.Update(gameTime);
+                if(enemy.CurrentEnemyState == EnemyState.Alive && GamePlayer.CheckBulletCollision(enemy.Sprite.SpriteBounds))
+                {
+                    enemy.EnemyDie();
+                }
             }
-
-            //playerAnimation.Update(gameTime);
-            //enemyAnimation.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -125,8 +126,11 @@ namespace BetterMosquitoes
             GamePlayer.DrawBullet(_spriteBatch);
             foreach (Enemy enemy in EnemyList)
             {
-                enemy.Draw(_spriteBatch);
-                enemy.DrawEnemyBullet(_spriteBatch);
+                 if(enemy.CurrentEnemyState == EnemyState.Alive)
+                {
+                    enemy.Draw(_spriteBatch);
+                    enemy.DrawEnemyBullet(_spriteBatch);
+                }
             }
             //playerAnimation.Draw(_spriteBatch, playerDirection, SpriteEffects.None);
             //enemyAnimation.Draw(_spriteBatch, enemyDirection, SpriteEffects.None);

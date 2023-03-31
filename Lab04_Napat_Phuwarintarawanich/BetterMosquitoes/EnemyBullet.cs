@@ -32,18 +32,6 @@ namespace BetterMosquitoes
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            switch (CurrentBulletState)
-            {
-                case BulletState.Flying:
-                    base.Draw(spriteBatch);
-                    break;
-                case BulletState.NotFlying:
-                    break;
-            }
-        }
-
         public bool Fire(Vector2 position)
         {
             bool fire = false;
@@ -58,5 +46,26 @@ namespace BetterMosquitoes
             }
             return fire;
         }
+
+        public void Collide()
+        {
+            if (CurrentBulletState == BulletState.Flying)
+            {
+                CurrentBulletState = BulletState.NotFlying;
+            }
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            switch (CurrentBulletState)
+            {
+                case BulletState.Flying:
+                    base.Draw(spriteBatch);
+                    break;
+                case BulletState.NotFlying:
+                    break;
+            }
+        }
+
     }
 }

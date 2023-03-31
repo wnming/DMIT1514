@@ -112,6 +112,20 @@ namespace BetterMosquitoes
             currentEnemyState = EnemyState.Dead;
         }
 
+        public bool CheckEnenmyBulletCollision(Rectangle playerBound)
+        {
+            bool isCollide = false;
+            foreach (EnemyBullet bullet in EnemyBulletsList)
+            {
+                if (bullet.CurrentBulletState == BulletState.Flying && bullet.IsCollide(playerBound))
+                {
+                    bullet.Collide();
+                    isCollide = true;
+                }
+            }
+            return isCollide;
+        }
+
         public void DrawEnemyBullet(SpriteBatch spriteBatch)
         {
             switch (currentEnemyState)

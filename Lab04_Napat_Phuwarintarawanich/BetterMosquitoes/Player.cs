@@ -19,7 +19,11 @@ namespace BetterMosquitoes
 
         private float Speed = 4f;
 
-        PlayerState currentPlayerState = PlayerState.Alive;
+        private int MaxHeart = 3;
+        public int CurrentHeart { get; set; }
+        public int PlayerScore { get; set; }
+
+        public PlayerState CurrentPlayerState = PlayerState.Alive;
 
         private bool leftPressed, rightPressed, firePressed;
 
@@ -38,6 +42,13 @@ namespace BetterMosquitoes
             GameArea = gameArea;
         }
 
+        public void Reset(int maxHeart)
+        {
+            CurrentHeart = maxHeart;
+            PlayerScore = 0;
+            CurrentPlayerState = PlayerState.Alive;
+        }
+
         public void LoadContent(ContentManager content)
         {
             playerbulletTexture = content.Load<Texture2D>("octopus_ink");
@@ -46,7 +57,7 @@ namespace BetterMosquitoes
 
         public void Update(GameTime gameTime)
         {
-            switch (currentPlayerState)
+            switch (CurrentPlayerState)
             {
                 case PlayerState.Alive:
                     SpriteSheet.Update(gameTime);
@@ -125,10 +136,11 @@ namespace BetterMosquitoes
             bool isCollide = false;
             foreach(PlayerBullet bullet in PlayerBulletsList)
             {
-                if (bullet.IsCollide(enemyBound))
+                if (bullet.CurrentBulletState == BulletState.Flying && bullet.IsCollide(enemyBound))
                 {
                     bullet.Collide();
                     isCollide = true;
+                    PlayerScore += 1;
                 }
             }
             return isCollide;
@@ -139,14 +151,14 @@ namespace BetterMosquitoes
 
         }
 
-        void PlayerDie()
+        public void PlayerDie()
         {
-            currentPlayerState = PlayerState.Dead;
+            CurrentPlayerState = PlayerState.Dead;
         }
 
         public void DrawBullet(SpriteBatch spriteBatch)
         {
-            switch (currentPlayerState)
+            switch (CurrentPlayerState)
             {
                 case PlayerState.Alive:
                     break;

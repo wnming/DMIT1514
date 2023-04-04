@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BetterMosquitoes
+namespace BetterJellyfish
 {
     public class Player : BaseObject
     {
@@ -17,11 +17,13 @@ namespace BetterMosquitoes
         PlayerControls Controls;
         Rectangle GameArea;
 
+
         private float Speed = 4f;
 
-        private int MaxHeart = 3;
+        public int MaxLoadBullet = 15;
         public int CurrentHeart { get; set; }
         public int PlayerScore { get; set; }
+        public int ReloadBullet { get; set; }
 
         public PlayerState CurrentPlayerState = PlayerState.Alive;
 
@@ -40,12 +42,14 @@ namespace BetterMosquitoes
             SpriteSheet = sprite;
             Controls = controls;
             GameArea = gameArea;
+            ReloadBullet = MaxLoadBullet;
         }
 
         public void Reset(int maxHeart)
         {
             CurrentHeart = maxHeart;
             PlayerScore = 0;
+            ReloadBullet = MaxLoadBullet;
             CurrentPlayerState = PlayerState.Alive;
         }
 
@@ -116,18 +120,18 @@ namespace BetterMosquitoes
 
         void PlayerShoot(GameTime gameTime)
         {
-            cooldowntime += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-            if (firePressed && cooldowntime >= 400)
+            if(!IsReloadBullet())
             {
-                bool fire = false;
-                //if (!isRest)
-                //{
-
-                //}
-                PlayerBullet newBullet = new PlayerBullet(bulletSprite, new ObjectTransform());
-                fire = newBullet.Fire(base.Transform.Position);
-                PlayerBulletsList.Add(newBullet);
-                cooldowntime = 0;
+                cooldowntime += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (firePressed && cooldowntime >= 400)
+                {
+                    bool fire = false;
+                    PlayerBullet newBullet = new PlayerBullet(bulletSprite, new ObjectTransform());
+                    fire = newBullet.Fire(base.Transform.Position);
+                    PlayerBulletsList.Add(newBullet);
+                    cooldowntime = 0;
+                    ReloadBullet -= 1;
+                }
             }
         }
 
@@ -154,6 +158,11 @@ namespace BetterMosquitoes
         public void PlayerDie()
         {
             CurrentPlayerState = PlayerState.Dead;
+        }
+
+        public bool IsReloadBullet()
+        {
+            return ReloadBullet <= 0;
         }
 
         public void DrawBullet(SpriteBatch spriteBatch)

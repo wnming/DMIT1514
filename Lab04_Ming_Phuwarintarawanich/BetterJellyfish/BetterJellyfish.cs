@@ -1,12 +1,11 @@
-﻿using Lesson05_Animations;
+﻿using Lab3_Napat_Phuwarintarawanich;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BetterMosquitoes
+namespace BetterJellyfish
 {
     public class BetterJellyfish : Game
     {
@@ -14,7 +13,8 @@ namespace BetterMosquitoes
         private SpriteBatch _spriteBatch;
 
         const int WindowWidth = 800;
-        const int WindowHeight = 550;
+        const int WindowHeight = 630;
+        const int GameHeight = 550;
 
         private Rectangle gameArea;
 
@@ -42,6 +42,7 @@ namespace BetterMosquitoes
         private int enemyRow = defaulfEnemyRow;
         private int initialYPosition = defaulfYPosition;
         private string GameStateMessage;
+        private int CurrentAliveEnemy;
         List<Enemy> EnemyList = new();
         Sprite EnemySprite;
         Texture2D EnemySpriteSheet;
@@ -51,6 +52,8 @@ namespace BetterMosquitoes
 
         private GameState CurrentGameState;
         protected KeyboardState PreviousState;
+
+        HUD Hud;
 
         public BetterJellyfish()
         {
@@ -64,12 +67,15 @@ namespace BetterMosquitoes
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            gameArea = new Rectangle(0, 0, WindowWidth, WindowHeight);
+            gameArea = new Rectangle(0, 0, WindowWidth, GameHeight);
             PlayerControl = new PlayerControls(Keys.Right, Keys.Left, Keys.Space);
             CurrentGameState = GameState.Initialize;
             IsFirstTime = true;
             IsLevel1 = true;
             PreviousState = Keyboard.GetState();
+
+            Hud = new HUD();
+            Hud.Initialize(new Vector2(0, GameHeight));
 
             base.Initialize();
         }
@@ -89,6 +95,8 @@ namespace BetterMosquitoes
 
             PlayerSpriteSheet = Content.Load<Texture2D>("player");
             EnemySpriteSheet = Content.Load<Texture2D>("jellyfish-enemy");
+
+            Hud.LoadContent(Content, tommy);
         }
 
         protected override void Update(GameTime gameTime)
@@ -104,6 +112,7 @@ namespace BetterMosquitoes
                     enemyRow = defaulfEnemyRow;
                     initialYPosition = defaulfYPosition;
                     numberOfEnemy = defaultNumberOfEnemy;
+                    IsPlayerWins = false;
 
                     PlayerSprite = new Sprite(PlayerSpriteSheet, new Rectangle(0, 0, PlayerSpriteSheet.Bounds.Width / 6, PlayerSpriteSheet.Height), 108, 108, 1 / 7f, 6, 1);
                     GamePlayer = new Player(PlayerSprite, new ObjectTransform(), PlayerControl, gameArea);
@@ -161,12 +170,17 @@ namespace BetterMosquitoes
                     break;
                 case GameState.Level1:
                     IsFirstTime = false;
+                    if (GamePlayer.IsReloadBullet() && Keyboard.GetState().IsKeyDown(Keys.L) && PreviousState.IsKeyUp(Keys.L))
+                    {
+                        GamePlayer.ReloadBullet = GamePlayer.MaxLoadBullet;
+                    }
                     if (Keyboard.GetState().IsKeyDown(Keys.P) && PreviousState.IsKeyUp(Keys.P))
                     {
                         CurrentGameState = GameState.Paused;
                         GameStateMessage = "Paused, press P to start playing.";
                     }
                     GamePlayer.Update(gameTime);
+                    CurrentAliveEnemy = 0;
                     foreach (Enemy enemy in EnemyList)
                     {
                         enemy.Update(gameTime);
@@ -177,29 +191,39 @@ namespace BetterMosquitoes
                         if (GamePlayer.CurrentPlayerState == PlayerState.Alive && enemy.CheckEnenmyBulletCollision(GamePlayer.Sprite.SpriteBounds))
                         {
                             GamePlayer.CurrentHeart -= 1;
-                            if(GamePlayer.CurrentHeart <= 0)
+                            if (GamePlayer.CurrentHeart <= 0)
                             {
                                 GamePlayer.PlayerDie();
                                 CurrentGameState = GameState.GameOver;
                             }
                         }
+                        if (enemy.CurrentEnemyState == EnemyState.Alive)
+                        {
+                            CurrentAliveEnemy += 1;
+                        }
                     }
-                    if(GamePlayer.CurrentPlayerState == PlayerState.Alive && EnemyList.Where(x => x.CurrentEnemyState == EnemyState.Dead).Count() == EnemyList.Count())
+                    if (GamePlayer.CurrentPlayerState == PlayerState.Alive && EnemyList.Where(x => x.CurrentEnemyState == EnemyState.Dead).Count() == EnemyList.Count())
                     {
                         TempPlayerHeart = GamePlayer.CurrentHeart;
                         TempPlayerScore = GamePlayer.PlayerScore;
                         IsLevel1 = false;
                         CurrentGameState = GameState.Initialize;
                     }
+                    Hud.Update(GamePlayer.CurrentHeart, CurrentAliveEnemy, GamePlayer.ReloadBullet);
                     break;
                 case GameState.Level2:
                     IsLevel1 = false;
+                    if (GamePlayer.IsReloadBullet() && Keyboard.GetState().IsKeyDown(Keys.L) && PreviousState.IsKeyUp(Keys.L))
+                    {
+                        GamePlayer.ReloadBullet = GamePlayer.MaxLoadBullet;
+                    }
                     if (Keyboard.GetState().IsKeyDown(Keys.P) && PreviousState.IsKeyUp(Keys.P))
                     {
                         CurrentGameState = GameState.Paused;
                         GameStateMessage = "Paused, press P to continue.";
                     }
                     GamePlayer.Update(gameTime);
+                    CurrentAliveEnemy = 0;
                     foreach (Enemy enemy in EnemyList)
                     {
                         enemy.Update(gameTime);
@@ -217,6 +241,10 @@ namespace BetterMosquitoes
                                 CurrentGameState = GameState.GameOver;
                             }
                         }
+                        if (enemy.CurrentEnemyState == EnemyState.Alive)
+                        {
+                            CurrentAliveEnemy += 1;
+                        }
                     }
                     if (GamePlayer.CurrentPlayerState == PlayerState.Alive && EnemyList.Where(x => x.CurrentEnemyState == EnemyState.Dead).Count() == EnemyList.Count())
                     {
@@ -224,6 +252,7 @@ namespace BetterMosquitoes
                         IsLevel1 = true;
                         CurrentGameState = GameState.GameOver;
                     }
+                    Hud.Update(GamePlayer.CurrentHeart, CurrentAliveEnemy, GamePlayer.ReloadBullet);
                     break;
                 case GameState.Paused:
                     if (Keyboard.GetState().IsKeyDown(Keys.P) && PreviousState.IsKeyUp(Keys.P))
@@ -271,6 +300,11 @@ namespace BetterMosquitoes
                             enemy.DrawEnemyBullet(_spriteBatch);
                         }
                     }
+                    if (GamePlayer.IsReloadBullet())
+                    {
+                        _spriteBatch.DrawString(tommy, "Press L to reload bullets..", new Vector2(270, 500), Color.Red);
+                    }
+                    Hud.Draw(_spriteBatch);
                     break;
                 case GameState.Level2:
                     _spriteBatch.Draw(level2Background, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
@@ -284,6 +318,11 @@ namespace BetterMosquitoes
                             enemy.DrawEnemyBullet(_spriteBatch);
                         }
                     }
+                    if (GamePlayer.IsReloadBullet())
+                    {
+                        _spriteBatch.DrawString(tommy, "Press L to reload bullets..", new Vector2(270, 500), Color.Red);
+                    }
+                    Hud.Draw(_spriteBatch);
                     break;
                 case GameState.Paused:
                     _spriteBatch.Draw(IsLevel1 ? level1Background : level2Background, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.DarkGray);

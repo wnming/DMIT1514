@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BetterMosquitoes
+namespace BetterJellyfish
 {
     public class Enemy : BaseObject
     {
@@ -52,7 +52,6 @@ namespace BetterMosquitoes
                     SpriteSheet.Update(gameTime);
                     EnemyMove(gameTime);
                     EnemyShoot(gameTime);
-                    //PlayerFire();
                     break;
                 case EnemyState.Dying:
                     break;
@@ -96,10 +95,6 @@ namespace BetterMosquitoes
             if (cooldowntime >= randomTimeShoot)
             {
                 bool fire = false;
-                //if (!isRest)
-                //{
-
-                //}
                 EnemyBullet newBullet = new EnemyBullet(bulletSprite, new ObjectTransform());
                 fire = newBullet.Fire(base.Transform.Position);
                 EnemyBulletsList.Add(newBullet);

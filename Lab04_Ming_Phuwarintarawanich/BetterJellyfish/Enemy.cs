@@ -107,7 +107,7 @@ namespace BetterJellyfish
             currentEnemyState = EnemyState.Dead;
         }
 
-        public bool CheckEnenmyBulletCollision(Rectangle playerBound)
+        public bool CheckEnenmyBulletCollision(Rectangle playerBound, Barrier barrier)
         {
             bool isCollide = false;
             foreach (EnemyBullet bullet in EnemyBulletsList)
@@ -116,6 +116,10 @@ namespace BetterJellyfish
                 {
                     bullet.Collide();
                     isCollide = true;
+                }
+                if(bullet.CurrentBulletState == BulletState.Flying && bullet.IsCollide(barrier.Sprite.SpriteBounds) && barrier.CurrentBarrierState == BarrierState.Alive)
+                {
+                    bullet.Collide();
                 }
             }
             return isCollide;
@@ -126,15 +130,15 @@ namespace BetterJellyfish
             switch (currentEnemyState)
             {
                 case EnemyState.Alive:
+                    foreach (EnemyBullet bullet in EnemyBulletsList)
+                    {
+                        bullet.Draw(spriteBatch);
+                    }
                     break;
                 case EnemyState.Dying:
                     break;
                 case EnemyState.Dead:
                     break;
-            }
-            foreach (EnemyBullet bullet in EnemyBulletsList)
-            {
-                bullet.Draw(spriteBatch);
             }
         }
     }

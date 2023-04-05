@@ -31,6 +31,14 @@ namespace BetterJellyfish
         Sprite PlayerSprite;
         Texture2D PlayerSpriteSheet;
 
+        Player PlayerBuddy;
+        Sprite PlayerBuddySprite;
+        Texture2D PlayerBuddySpriteSheet;
+
+        List<Barrier> BarriersList = new();
+        Texture2D BarrierTexture;
+        Sprite BarrierSprite;
+
         private bool IsFirstTime;
         private bool IsLevel1;
         private bool IsPlayerWins;
@@ -49,6 +57,7 @@ namespace BetterJellyfish
 
         public int TempPlayerHeart;
         public int TempPlayerScore;
+        public int TempPlayerBuddyScore;
 
         private GameState CurrentGameState;
         protected KeyboardState PreviousState;
@@ -95,6 +104,9 @@ namespace BetterJellyfish
 
             PlayerSpriteSheet = Content.Load<Texture2D>("player");
             EnemySpriteSheet = Content.Load<Texture2D>("jellyfish-enemy");
+            PlayerBuddySpriteSheet = Content.Load<Texture2D>("player-buddy");
+
+            BarrierTexture = Content.Load<Texture2D>("barrier");
 
             Hud.LoadContent(Content, tommy);
         }
@@ -115,21 +127,28 @@ namespace BetterJellyfish
                     IsPlayerWins = false;
 
                     PlayerSprite = new Sprite(PlayerSpriteSheet, new Rectangle(0, 0, PlayerSpriteSheet.Bounds.Width / 6, PlayerSpriteSheet.Height), 108, 108, 1 / 7f, 6, 1);
-                    GamePlayer = new Player(PlayerSprite, new ObjectTransform(), PlayerControl, gameArea);
+                    GamePlayer = new Player(PlayerSprite, new ObjectTransform(), PlayerControl, gameArea, false);
                     GamePlayer.Transform.TranslatePosition(new Vector2(200, 440));
                     GamePlayer.LoadContent(Content);
+
+                    PlayerBuddySprite = new Sprite(PlayerBuddySpriteSheet, new Rectangle(0, 0, PlayerBuddySpriteSheet.Bounds.Width / 4, PlayerBuddySpriteSheet.Height), 59, 93, 1 / 7f, 4, 1);
+                    PlayerBuddy = new Player(PlayerBuddySprite, new ObjectTransform(), new PlayerControls(), gameArea, true);
+                    PlayerBuddy.Transform.TranslatePosition(new Vector2(100, 480));
+                    PlayerBuddy.LoadContent(Content);
                     if (!IsLevel1)
                     {
                         numberOfEnemy = 24;
                         enemyRow = 3;
                         GamePlayer.CurrentHeart = TempPlayerHeart;
                         GamePlayer.PlayerScore = TempPlayerScore;
+                        PlayerBuddy.PlayerScore = TempPlayerBuddyScore;
                     }
                     else
                     {
                         GamePlayer.Reset(MaxHeart);
                         TempPlayerHeart = MaxHeart;
                         TempPlayerScore = 0;
+                        TempPlayerBuddyScore = 0;
                     }
 
                     EnemySprite = new Sprite(EnemySpriteSheet, new Rectangle(0, 0, EnemySpriteSheet.Bounds.Width / 5, EnemySpriteSheet.Bounds.Height), 63, 53, 1 / 0.5f, 5, 1);
@@ -145,6 +164,14 @@ namespace BetterJellyfish
                         }
                         initialYPosition += 70;
                         enemyRow -= 1;
+                    }
+                    BarrierSprite = new Sprite(BarrierTexture, BarrierTexture.Bounds, 77, 150, 0, 1, 1);
+                    for (int index = 0; index < 2; index++)
+                    {
+                        Barrier newBarrier = new Barrier(BarrierSprite, new ObjectTransform());
+                        newBarrier.Transform.TranslatePosition(new Vector2(index * 420 + 100, 350));
+                        newBarrier.Sprite.UpdateSpriteBounds(newBarrier.Transform);
+                        BarriersList.Add(newBarrier);
                     }
                     CurrentGameState = GameState.MainMenu;
                     break;
@@ -180,21 +207,30 @@ namespace BetterJellyfish
                         GameStateMessage = "Paused, press P to start playing.";
                     }
                     GamePlayer.Update(gameTime);
+                    PlayerBuddy.Update(gameTime);
                     CurrentAliveEnemy = 0;
                     foreach (Enemy enemy in EnemyList)
                     {
                         enemy.Update(gameTime);
-                        if (enemy.CurrentEnemyState == EnemyState.Alive && GamePlayer.CheckBulletCollision(enemy.Sprite.SpriteBounds))
+                        foreach (Barrier barrier in BarriersList)
                         {
-                            enemy.EnemyDie();
-                        }
-                        if (GamePlayer.CurrentPlayerState == PlayerState.Alive && enemy.CheckEnenmyBulletCollision(GamePlayer.Sprite.SpriteBounds))
-                        {
-                            GamePlayer.CurrentHeart -= 1;
-                            if (GamePlayer.CurrentHeart <= 0)
+                            barrier.CheckBarrierCollision(enemy.Sprite.SpriteBounds);
+                            if (enemy.CurrentEnemyState == EnemyState.Alive && GamePlayer.CheckBulletCollision(enemy.Sprite.SpriteBounds, barrier))
                             {
-                                GamePlayer.PlayerDie();
-                                CurrentGameState = GameState.GameOver;
+                                enemy.EnemyDie();
+                            }
+                            if (enemy.CurrentEnemyState == EnemyState.Alive && PlayerBuddy.CheckBulletCollision(enemy.Sprite.SpriteBounds, barrier))
+                            {
+                                enemy.EnemyDie();
+                            }
+                            if (GamePlayer.CurrentPlayerState == PlayerState.Alive && enemy.CurrentEnemyState == EnemyState.Alive && enemy.CheckEnenmyBulletCollision(GamePlayer.Sprite.SpriteBounds, barrier))
+                            {
+                                GamePlayer.CurrentHeart -= 1;
+                                if (GamePlayer.CurrentHeart <= 0 || GamePlayer.CurrentPlayerState == PlayerState.Dead)
+                                {
+                                    GamePlayer.PlayerDie();
+                                    CurrentGameState = GameState.GameOver;
+                                }
                             }
                         }
                         if (enemy.CurrentEnemyState == EnemyState.Alive)
@@ -223,22 +259,31 @@ namespace BetterJellyfish
                         GameStateMessage = "Paused, press P to continue.";
                     }
                     GamePlayer.Update(gameTime);
+                    PlayerBuddy.Update(gameTime);
                     CurrentAliveEnemy = 0;
                     foreach (Enemy enemy in EnemyList)
                     {
                         enemy.Update(gameTime);
-                        if (enemy.CurrentEnemyState == EnemyState.Alive && GamePlayer.CheckBulletCollision(enemy.Sprite.SpriteBounds))
+                        foreach (Barrier barrier in BarriersList)
                         {
-                            enemy.EnemyDie();
-                        }
-                        if (GamePlayer.CurrentPlayerState == PlayerState.Alive && enemy.CheckEnenmyBulletCollision(GamePlayer.Sprite.SpriteBounds))
-                        {
-                            GamePlayer.CurrentHeart -= 1;
-                            if (GamePlayer.CurrentHeart <= 0)
+                            barrier.CheckBarrierCollision(enemy.Sprite.SpriteBounds);
+                            if (enemy.CurrentEnemyState == EnemyState.Alive && GamePlayer.CheckBulletCollision(enemy.Sprite.SpriteBounds, barrier))
                             {
-                                GamePlayer.PlayerDie();
-                                IsLevel1 = true;
-                                CurrentGameState = GameState.GameOver;
+                                enemy.EnemyDie();
+                            }
+                            if (enemy.CurrentEnemyState == EnemyState.Alive && PlayerBuddy.CheckBulletCollision(enemy.Sprite.SpriteBounds, barrier))
+                            {
+                                enemy.EnemyDie();
+                            }
+                            if (GamePlayer.CurrentPlayerState == PlayerState.Alive && enemy.CurrentEnemyState == EnemyState.Alive && enemy.CheckEnenmyBulletCollision(GamePlayer.Sprite.SpriteBounds, barrier))
+                            {
+                                GamePlayer.CurrentHeart -= 1;
+                                if (GamePlayer.CurrentHeart <= 0 || GamePlayer.CurrentPlayerState == PlayerState.Dead)
+                                {
+                                    GamePlayer.PlayerDie();
+                                    IsLevel1 = true;
+                                    CurrentGameState = GameState.GameOver;
+                                }
                             }
                         }
                         if (enemy.CurrentEnemyState == EnemyState.Alive)
@@ -290,6 +335,8 @@ namespace BetterJellyfish
                     break;
                 case GameState.Level1:
                     _spriteBatch.Draw(level1Background, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
+                    PlayerBuddy.Draw(_spriteBatch);
+                    PlayerBuddy.DrawBullet(_spriteBatch);
                     GamePlayer.Draw(_spriteBatch);
                     GamePlayer.DrawBullet(_spriteBatch);
                     foreach (Enemy enemy in EnemyList)
@@ -303,11 +350,17 @@ namespace BetterJellyfish
                     if (GamePlayer.IsReloadBullet())
                     {
                         _spriteBatch.DrawString(tommy, "Press L to reload bullets..", new Vector2(270, 500), Color.Red);
+                    }
+                    foreach (Barrier barrier in BarriersList)
+                    {
+                        barrier.Draw(_spriteBatch);
                     }
                     Hud.Draw(_spriteBatch);
                     break;
                 case GameState.Level2:
                     _spriteBatch.Draw(level2Background, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
+                    PlayerBuddy.Draw(_spriteBatch);
+                    PlayerBuddy.DrawBullet(_spriteBatch);
                     GamePlayer.Draw(_spriteBatch);
                     GamePlayer.DrawBullet(_spriteBatch);
                     foreach (Enemy enemy in EnemyList)
@@ -321,6 +374,10 @@ namespace BetterJellyfish
                     if (GamePlayer.IsReloadBullet())
                     {
                         _spriteBatch.DrawString(tommy, "Press L to reload bullets..", new Vector2(270, 500), Color.Red);
+                    }
+                    foreach (Barrier barrier in BarriersList)
+                    {
+                        barrier.Draw(_spriteBatch);
                     }
                     Hud.Draw(_spriteBatch);
                     break;
@@ -332,15 +389,13 @@ namespace BetterJellyfish
                     _spriteBatch.Draw(gameOverBackground, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
                     _spriteBatch.DrawString(cocogoose, IsPlayerWins ? "Player Wins" : "Game Over", new Vector2(190, 80), Color.DeepPink);
                     _spriteBatch.DrawString(tommy, $"You shot {GamePlayer.PlayerScore} enemies.", new Vector2(270, 170), Color.DarkOrange);
+                    _spriteBatch.DrawString(tommy, $"Your buddy shot {PlayerBuddy.PlayerScore} enemies.", new Vector2(230, 210), Color.BlueViolet);
                     _spriteBatch.DrawString(tommy, "Hit enter to Play Again".ToUpper(), new Vector2(210, WindowHeight - 60), Color.White);
                     break;
                 default:
                     break;
             }
-
             _spriteBatch.End();
-
-
             base.Draw(gameTime);
         }
     }

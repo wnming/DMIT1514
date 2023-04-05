@@ -36,26 +36,30 @@ namespace BetterJellyfish
 
         float cooldowntime = 0;
 
-        public Player(Sprite sprite, ObjectTransform transform, PlayerControls controls, Rectangle gameArea) : base(sprite, transform)
+        private bool IsBuddy;
+        private bool BuddyDirectionLeft = true;
+
+        public Player(Sprite sprite, ObjectTransform transform, PlayerControls controls, Rectangle gameArea, bool isBuddy) : base(sprite, transform)
         {
             Transform = transform;
             SpriteSheet = sprite;
             Controls = controls;
             GameArea = gameArea;
             ReloadBullet = MaxLoadBullet;
+            IsBuddy = isBuddy;
         }
 
         public void Reset(int maxHeart)
         {
             CurrentHeart = maxHeart;
             PlayerScore = 0;
-            ReloadBullet = MaxLoadBullet;
+              ReloadBullet = MaxLoadBullet;
             CurrentPlayerState = PlayerState.Alive;
         }
 
         public void LoadContent(ContentManager content)
         {
-            playerbulletTexture = content.Load<Texture2D>("octopus_ink");
+            playerbulletTexture = content.Load<Texture2D>(IsBuddy ? "buddy-bullet" : "octopus_ink");
             bulletSprite = new Sprite(playerbulletTexture, playerbulletTexture.Bounds, 26, 5, 0, 1, 1);
         }
 
@@ -91,28 +95,52 @@ namespace BetterJellyfish
 
         void PlayerMove()
         {
-            if (leftPressed)
+            if (IsBuddy)
             {
-                Transform.Direction = new Vector2(-1, 0);
+                //90 is player rectangular - player transparent space
                 if (base.Transform.Position.X < GameArea.Left)
                 {
-                    Transform.Direction = Vector2.Zero;
+                    BuddyDirectionLeft = false;
                 }
+                if (base.Transform.Position.X + 90 > GameArea.Right)
+                {
+                    BuddyDirectionLeft = true;
+                }
+                if (BuddyDirectionLeft)
+                {
+                    Transform.Direction = new Vector2(-1, 0);
+                }
+                else
+                {
+                    Transform.Direction = new Vector2(1, 0);
+                }
+                Speed = 3f;
             }
             else
             {
-                if (rightPressed)
+                if (leftPressed)
                 {
-                    Transform.Direction = new Vector2(1, 0);
-                    //90 is player rectangular - player transparent space
-                    if (base.Transform.Position.X + 90 > GameArea.Right)
+                    Transform.Direction = new Vector2(-1, 0);
+                    if (base.Transform.Position.X < GameArea.Left)
                     {
                         Transform.Direction = Vector2.Zero;
                     }
                 }
                 else
                 {
-                    Transform.Direction = Vector2.Zero;
+                    if (rightPressed)
+                    {
+                        Transform.Direction = new Vector2(1, 0);
+                        //90 is player rectangular - player transparent space
+                        if (base.Transform.Position.X + 90 > GameArea.Right)
+                        {
+                            Transform.Direction = Vector2.Zero;
+                        }
+                    }
+                    else
+                    {
+                        Transform.Direction = Vector2.Zero;
+                    }
                 }
             }
             Move(Transform.Direction * Speed);
@@ -120,10 +148,10 @@ namespace BetterJellyfish
 
         void PlayerShoot(GameTime gameTime)
         {
-            if(!IsReloadBullet())
+            if (IsBuddy)
             {
                 cooldowntime += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-                if (firePressed && cooldowntime >= 400)
+                if (cooldowntime >= 1200)
                 {
                     bool fire = false;
                     PlayerBullet newBullet = new PlayerBullet(bulletSprite, new ObjectTransform());
@@ -133,9 +161,25 @@ namespace BetterJellyfish
                     ReloadBullet -= 1;
                 }
             }
+            else
+            {
+                if (!IsReloadBullet())
+                {
+                    cooldowntime += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                    if (firePressed && cooldowntime >= 400)
+                    {
+                        bool fire = false;
+                        PlayerBullet newBullet = new PlayerBullet(bulletSprite, new ObjectTransform());
+                        fire = newBullet.Fire(base.Transform.Position);
+                        PlayerBulletsList.Add(newBullet);
+                        cooldowntime = 0;
+                        ReloadBullet -= 1;
+                    }
+                }
+            }
         }
 
-        public bool CheckBulletCollision(Rectangle enemyBound)
+        public bool CheckBulletCollision(Rectangle enemyBound, Barrier barrier)
         {
             bool isCollide = false;
             foreach(PlayerBullet bullet in PlayerBulletsList)
@@ -146,13 +190,17 @@ namespace BetterJellyfish
                     isCollide = true;
                     PlayerScore += 1;
                 }
+                if (bullet.CurrentBulletState == BulletState.Flying && bullet.IsCollide(barrier.Sprite.SpriteBounds) && barrier.CurrentBarrierState == BarrierState.Alive)
+                {
+                    bullet.Collide();
+                }
             }
             return isCollide;
         }
 
-        public void CheckPlayerCollision()
+        public void CheckPlayerCollision(Rectangle enemyBound)
         {
-
+            PlayerDie();
         }
 
         public void PlayerDie()
@@ -170,15 +218,15 @@ namespace BetterJellyfish
             switch (CurrentPlayerState)
             {
                 case PlayerState.Alive:
+                    foreach (PlayerBullet bullet in PlayerBulletsList)
+                    {
+                        bullet.Draw(spriteBatch);
+                    }
                     break;
                 case PlayerState.Dying:
                     break;
                 case PlayerState.Dead:
                     break;
-            }
-            foreach (PlayerBullet bullet in PlayerBulletsList)
-            {
-                 bullet.Draw(spriteBatch);
             }
         }
     }

@@ -62,14 +62,14 @@ namespace PlatformerGame
                         }
                         break;
                     case PlatformColliderType.Top:
+                        player.Land(BoundingBox);
+                        player.StandOn(BoundingBox);
+                        break;
+                    case PlatformColliderType.Bottom:
                         if (player.Velocity.Y < 0)
                         {
                             player.MoveUpDown(0);
                         }
-                        break;
-                    case PlatformColliderType.Bottom:
-                        player.Land(BoundingBox);
-                        player.StandOn(BoundingBox);
                         break;
                 }
             }

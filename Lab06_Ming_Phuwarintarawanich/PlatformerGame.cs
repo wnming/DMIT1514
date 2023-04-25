@@ -39,13 +39,13 @@ namespace PlatformerGame
         {
             gameArea = new Rectangle(0, 0, WindowWidth, WindowHeight);
 
-            player = new Player(new Vector2(250, 100), gameArea);
-            groundCollider = new PlatformCollider(PlatformCollider.PlatformColliderType.Top, new Vector2(0, 500), new Vector2(WindowWidth, 1));
+            player = new Player(new Vector2(200, 500), gameArea);
+            groundCollider = new PlatformCollider(PlatformCollider.PlatformColliderType.Top, new Vector2(0, 10), new Vector2(WindowWidth, 1));
             //topCollider = new PlatformCollider(PlatformCollider.PlatformColliderType.Top, new Vector2(0, 0), new Vector2(WindowWidth, 1));
-            platforms.Add(new Platform(new Vector2(50, 100), new Vector2(50, 25)));
-            platforms.Add(new Platform(new Vector2(150, 150), new Vector2(50, 25)));
-            platforms.Add(new Platform(new Vector2(250, 200), new Vector2(50, 25)));
-            platforms.Add(new Platform(new Vector2(350, 250), new Vector2(50, 25)));
+            platforms.Add(new Platform(new Vector2(50, 100), new Vector2(80, 50)));
+            platforms.Add(new Platform(new Vector2(150, 200), new Vector2(80, 50)));
+            platforms.Add(new Platform(new Vector2(250, 300), new Vector2(80, 50)));
+            platforms.Add(new Platform(new Vector2(350, 400), new Vector2(80, 50)));
 
             base.Initialize();
 

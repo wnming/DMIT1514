@@ -19,12 +19,14 @@ namespace PlatformerGame
         protected Vector2 velocity;
         internal Vector2 Velocity { get => velocity; }
 
-        private Texture2D walkingManTexture;
-        Dictionary<string, Rectangle[]> walkingManRectangle = new Dictionary<string, Rectangle[]>();
-
         private const int PlayerJumpForce = -300;
         private const int PlayerSpeed = 150;
+
+        private Texture2D walkingManTexture;
+        Dictionary<string, Rectangle[]> walkingManRectangle = new Dictionary<string, Rectangle[]>();
         private const int SpriteColumn = 4;
+        private float timeElapsed = 0.0f;
+        private float timeToUpdate = 1 / 8.0f;
 
         private PlayerState currentState = PlayerState.left;
         private int frame = 1;
@@ -50,12 +52,13 @@ namespace PlatformerGame
 
             walkingManRectangle["right"] = new Rectangle[4] { new Rectangle(0, 458, 102, 153), new Rectangle(102, 458, 102, 153), new Rectangle(204, 458, 102, 153), new Rectangle(306, 458, 102, 153) };
             walkingManRectangle["left"] = new Rectangle[4] { new Rectangle(0, 305, 102, 153), new Rectangle(102, 305, 102, 153), new Rectangle(204, 305, 102, 153), new Rectangle(306, 305, 102, 153) };
-            //walkingManRectangle["up"] = new Rectangle[4] { new Rectangle(0, 153, 102, 153), new Rectangle(102, 153, 102, 153), new Rectangle(204, 153, 102, 153), new Rectangle(306, 153, 102, 153) };
             walkingManRectangle["up"] = new Rectangle[4] { new Rectangle(0, 0, 102, 153), new Rectangle(102, 0, 102, 153), new Rectangle(204, 0, 102, 153), new Rectangle(306, 0, 102, 153) };
         }
 
         internal void Update(GameTime gameTime)
         {
+            timeElapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             velocity.Y += PlatformerGame.Gravity;
 
             position += velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -82,23 +85,29 @@ namespace PlatformerGame
         {
             float oldXDirection = velocity.X;
             velocity.X = direction * PlayerSpeed;
-            if (velocity.X > 0)
+
+            if (timeElapsed > timeToUpdate)
             {
-                frame++;
-                if (frame == SpriteColumn)
+                timeElapsed -= timeToUpdate;
+
+                if (velocity.X > 0)
                 {
-                    frame = 0;
+                    frame++;
+                    if (frame == SpriteColumn)
+                    {
+                        frame = 0;
+                    }
+                    currentState = PlayerState.right;
                 }
-                currentState = PlayerState.right;
-            }
-            else if (velocity.X < 0)
-            {
-                frame++;
-                if (frame == SpriteColumn)
+                else if (velocity.X < 0)
                 {
-                    frame = 0;
+                    frame++;
+                    if (frame == SpriteColumn)
+                    {
+                        frame = 0;
+                    }
+                    currentState = PlayerState.left;
                 }
-                currentState = PlayerState.left;
             }
             //if (state != State.Jumping)
             //{

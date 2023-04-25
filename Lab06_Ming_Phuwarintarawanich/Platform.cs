@@ -23,25 +23,25 @@ namespace PlatformerGame
         public Platform(Vector2 position, Vector2 dimensions)
         {
             left = new PlatformCollider(
-                                        PlatformCollider.PlatformColliderType.Left,
-                                        new Vector2(position.X + 3, position.Y),
-                                        new Vector2(dimensions.X - 6, 1)
-                                        );
+                                    PlatformCollider.PlatformColliderType.Left,
+                                    new Vector2(position.X + 3, position.Y),
+                                    new Vector2(dimensions.X - 6, 1)
+                                    );
             right = new PlatformCollider(
-                                        PlatformCollider.PlatformColliderType.Right,
-                                        new Vector2(position.X + dimensions.X - 1, position.Y + 1),
-                                        new Vector2(1, dimensions.Y - 2)
-                                        );
+                                    PlatformCollider.PlatformColliderType.Right,
+                                    new Vector2(position.X + dimensions.X - 1, position.Y + 1),
+                                    new Vector2(1, dimensions.Y - 2)
+                                    );
             top = new PlatformCollider(
-                                        PlatformCollider.PlatformColliderType.Top,
-                                        new Vector2(position.X + 3, position.Y + dimensions.Y),
-                                        new Vector2(dimensions.X - 6, 1)
-                                        );
+                                    PlatformCollider.PlatformColliderType.Top,
+                                    new Vector2(position.X + 3, position.Y + dimensions.Y),
+                                    new Vector2(dimensions.X - 6, 1)
+                                    );
             bottom = new PlatformCollider(
-                                        PlatformCollider.PlatformColliderType.Bottom,
-                                        new Vector2(position.X, position.Y + 1),
-                                        new Vector2(1, dimensions.Y - 2)
-                                        );
+                                    PlatformCollider.PlatformColliderType.Bottom,
+                                    new Vector2(position.X, position.Y + 1),
+                                    new Vector2(1, dimensions.Y - 2)
+                                    );
         }
 
         internal void LoadContent(ContentManager Content)
@@ -52,20 +52,20 @@ namespace PlatformerGame
             bottom.LoadContent(Content);
         }
 
-        internal void Draw(SpriteBatch spriteBatch)
-        {
-            left.Draw(spriteBatch);
-            right.Draw(spriteBatch);
-            top.Draw(spriteBatch);
-            bottom.Draw(spriteBatch);
-        }
-
         internal void ProcessCollisions(Player player)
         {
             left.ProcessCollisions(player);
             right.ProcessCollisions(player);
             top.ProcessCollisions(player);
             bottom.ProcessCollisions(player);
+        }
+
+        internal void Draw(SpriteBatch spriteBatch)
+        {
+            left.Draw(spriteBatch);
+            right.Draw(spriteBatch);
+            top.Draw(spriteBatch);
+            bottom.Draw(spriteBatch);
         }
     }
 }

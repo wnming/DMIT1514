@@ -1,0 +1,22 @@
+REQUIRED (12/20 marks):
+Done - (2 marks) Add states to your game (suggestions: Menu, Level01, Level02, Paused and Over) . Make sure that the cannon and mosquito have states as well (Alive, Dying, Dead, for example).
+Make the game an actual game:
+Done - (4 marks) The player will have three lives, and move to Level02 when she kills all of the mosquitoes. Level02 can have the same number of mosquitoes as Level01, or be different in some way.
+Done - (4 marks) Create a new class called "Barrier". You will have to add an asset to the game (a sprite) for Barrier.
+There will be two barriers that the cannon can hide behind. 
+A Barrier absorbs Cannonballs and Fireballs.
+Done - (2 marks) Add reloading to the game. That is, make the cannon be able to run out of cannonballs, and give the player the ability to reload by pressing a button. Add some sort of indicator to tell the player that the cannonballs have run out.
+
+OPTIONAL (Up to 8 more marks, for a total of 20 marks)
+Done - (1 mark) Add a HUD to the game. The HUD will have a separate background, and will be added to the sides, top, or bottom of the current playing screen. The HUD should display at least 3 values (of your choice).
+No - (1 mark) Add a level, over and above the ones from the last requirement, that incorporates some sort of new challenge.
+No - (2 marks) Make "sine wave" cannon balls.
+No - (2 marks) Add a different type of projectile for the cannon (with a different class, that acts differently than the cannon ball).
+No - (2 marks) Add a scale data member to all of your classes. 
+No - (1 mark) Allow the player to choose the scale in the menu.
+No - (2 marks) Add a power-up to the game. It will confer some benefit to the Cannon. It will have a different class.
+Done - (2 marks) Give some or all mosquitoes the ability to swoop down.
+No - (1 mark) Turn the game 90 degrees (you would have to add a different background).
+Done - (2 marks) Give the player a "cannon buddy". This would be a non-player-bot who fights on the cannon's side, against the mosquitoes.
+No - (3 marks) Give the cannon a rotating barrel. One set of controls aims the barrel, another moves the cannon.
+No - (2 marks) Give the barrier the ability to move. It will be near the bottom of the screen, move back and forth, and block all projectiles.

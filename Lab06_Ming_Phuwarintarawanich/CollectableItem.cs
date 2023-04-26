@@ -16,11 +16,11 @@ namespace PlatformerGame
 
         protected ItemState itemState = ItemState.NotCollect;
 
-        public CollectableItem(Game game, Transform transform, Rectangle rectangle, Texture2D texture) : base(game, transform, rectangle, texture)
+        public CollectableItem(Game game, Transform transform, Rectangle rectangle, Texture2D texture, int celWidth) : base(game, transform, rectangle, texture)
         {
             _rectangleBounds.Location = transform.Position.ToPoint();
             celPlayer = new CelAnimationPlayer();
-            celAnimationSequence = new CelAnimationSequence(Texture, 40, 0.5f);
+            celAnimationSequence = new CelAnimationSequence(Texture, celWidth, 0.5f);
             celPlayer.Play(celAnimationSequence);
         }
 
@@ -48,10 +48,22 @@ namespace PlatformerGame
             }
         }
 
+        public ItemState GetState()
+        {
+            return itemState;
+        }
+
+        public void SetState(ItemState itemState)
+        {
+            this.itemState = itemState;
+        }
+
         public override void Draw(GameTime gameTime)
         {
             switch (itemState)
             {
+                case ItemState.Hidden:
+                    break;
                 case ItemState.NotCollect:
                     spriteBatch.Begin(samplerState: SamplerState.PointClamp);
                     celPlayer.Draw(spriteBatch, _transform.Position, SpriteEffects.None);
@@ -66,6 +78,7 @@ namespace PlatformerGame
 
         public enum ItemState
         {
+            Hidden,
             NotCollect,
             Collect
         }

@@ -1,11 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace PlatformerGame
 {
@@ -15,15 +11,9 @@ namespace PlatformerGame
         protected Texture2D colliderTexture;
         protected Vector2 position;
         protected Vector2 dimensions;
-        internal Rectangle BoundingBox
-        {
-            get
-            {
-                return new Rectangle((int)position.X, (int)position.Y, (int)dimensions.X, (int)dimensions.Y);
-            }
-        }
+        internal Rectangle ColliderBox { get => new Rectangle((int)position.X, (int)position.Y, (int)dimensions.X, (int)dimensions.Y); }
 
-        public PlatformCollider(PlatformColliderType colliderType,Vector2 position, Vector2 dimensions)
+        public PlatformCollider(PlatformColliderType colliderType, Vector2 position, Vector2 dimensions)
         {
             this.colliderType = colliderType;
             this.position = position;
@@ -34,14 +24,10 @@ namespace PlatformerGame
         {
             colliderTexture = Content.Load<Texture2D>("platform");
         }
-        internal void Draw(SpriteBatch spriteBatch, Color color)
-        {
-            spriteBatch.Draw(colliderTexture, BoundingBox, new Rectangle(0, 0, 1, 1), color);
-        }
 
-        internal void IsCollide(Player player)
+        internal void CheckCollision(Player player)
         {
-            if (BoundingBox.Intersects(player.RectangleBounds))
+            if (ColliderBox.Intersects(player.RectangleBounds))
             {
                 switch (colliderType)
                 {
@@ -58,7 +44,7 @@ namespace PlatformerGame
                         }
                         break;
                     case PlatformColliderType.Top:
-                        player.Ground(BoundingBox);
+                        player.Ground(ColliderBox);
                         player.Stand();
                         break;
                     case PlatformColliderType.Bottom:
@@ -71,12 +57,17 @@ namespace PlatformerGame
             }
         }
 
+        internal void Draw(SpriteBatch spriteBatch, Color color)
+        {
+            spriteBatch.Draw(colliderTexture, ColliderBox, new Rectangle(0, 0, 1, 1), color);
+        }
+
         public enum PlatformColliderType
         {
             Left,
             Right,
-            Bottom,
-            Top
+            Top,
+            Bottom
         }
     }
 }

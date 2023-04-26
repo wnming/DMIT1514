@@ -19,6 +19,8 @@ namespace PlatformerGame
         internal const float Gravity = 9.81f;
 
         Texture2D background;
+        Texture2D mainmenuBackground;
+        Texture2D finishBackground;
 
         Player player;
         CelAnimationSet animationSet;
@@ -33,12 +35,25 @@ namespace PlatformerGame
 
         List<Texture2D> itemsTexture = new();
         protected List<CollectableItem> items = new();
-        List<int> randomNumber = new List<int>() { 0, 0, 0, 0, 0, 0, 0};
+        List<int> randomNumber = new List<int>() { 0, 0, 0, 0, 0, 0, 0 };
+        int itemsCelWidth = 40;
+
+        Texture2D trophyTexture;
+        CollectableItem trophy;
+        bool isDrawTrophy = false;
 
         private Random random = new Random();
         int redIndensity = 255, greenIndensity = 255, blueIndensity = 255;
         private const float delayTime = 5f;
         private float remainDelayTime = delayTime;
+
+        internal static GameState gameState { get; private set; } = GameState.MainMenu;
+        private double elapsedTime = 0;
+
+        private SpriteFont font;
+        private SpriteFont biggerFont;
+        private int countStartTime = 1500;
+        private int countStart = 3;
 
         public PlatformerGame()
         {
@@ -65,26 +80,20 @@ namespace PlatformerGame
 
             base.Initialize();
 
-            Window.Title = "Platformer Game";
+            Window.Title = "Platformer Game - Collect all Tetris";
             _graphics.PreferredBackBufferWidth = WindowWidth;
             _graphics.PreferredBackBufferHeight = WindowHeight;
             _graphics.ApplyChanges();
-
-            player = new Player(new Transform(new Vector2(48, 300), 0, 1), this, new Rectangle(0, 0, 48, 83), playerTexture[0], animationSet);
-
-            items.Add(new CollectableItem(this, new Transform(new Vector2(110, WindowHeight - 460), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[0]));
-            items.Add(new CollectableItem(this, new Transform(new Vector2(280, WindowHeight - 380), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[1]));
-            items.Add(new CollectableItem(this, new Transform(new Vector2(520, WindowHeight - 380), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[2]));
-            items.Add(new CollectableItem(this, new Transform(new Vector2(700, WindowHeight - 460), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[3]));
-            items.Add(new CollectableItem(this, new Transform(new Vector2(395, WindowHeight - 510), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[4]));
-            items.Add(new CollectableItem(this, new Transform(new Vector2(130, WindowHeight - 260), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[5]));
-            items.Add(new CollectableItem(this, new Transform(new Vector2(675, WindowHeight - 260), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[6]));
         }
 
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            font = Content.Load<SpriteFont>("kindergarten");
+            biggerFont = Content.Load<SpriteFont>("kindergartenBigger");
             background = Content.Load<Texture2D>("background");
+            mainmenuBackground = Content.Load<Texture2D>("mainmenu-bg");
+            finishBackground = Content.Load<Texture2D>("finish-bg");
 
             foreach (PlatformCollider bound in boundsCollider)
             {
@@ -94,11 +103,11 @@ namespace PlatformerGame
             {
                 platform.LoadContent(Content);
             }
-            for(int count = 0; count < 7; count++)
+            for (int count = 0; count < 7; count++)
             {
                 itemsTexture.Add(Content.Load<Texture2D>($"tetris-{randomNumber[count]}"));
             }
-
+            trophyTexture = Content.Load<Texture2D>("trophy");
             playerTexture.Add(Content.Load<Texture2D>("player-idle"));
             playerTexture.Add(Content.Load<Texture2D>("player-walk"));
             playerTexture.Add(Content.Load<Texture2D>("player-jump"));
@@ -111,41 +120,92 @@ namespace PlatformerGame
                 Exit();
 
             KeyboardState keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(Keys.Left))
+            switch (gameState)
             {
-                player.MoveLeftRight(-1);
-            }
-            else if (keyboardState.IsKeyDown(Keys.Right))
-            {
-                player.MoveLeftRight(1);
-            }
-            else
-            {
-                player.StopMoving();
-                player.currentState = Player.PlayerState.idle;
-            }
+                case GameState.MainMenu:
+                    elapsedTime += gameTime.ElapsedGameTime.TotalMilliseconds;
+                    if (elapsedTime > countStartTime)
+                    {
+                        countStart -= 1;
+                        countStartTime += 1900;
+                    }
+                    if (elapsedTime > 5000)
+                    {
+                        player = new Player(new Transform(new Vector2(48, 300), 0, 1), this, new Rectangle(0, 0, 48, 83), playerTexture[0], animationSet);
 
-            if (keyboardState.IsKeyDown(Keys.Space))
-            {
-                player.Jump();
-            }
+                        items.Add(new CollectableItem(this, new Transform(new Vector2(110, WindowHeight - 460), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[0], itemsCelWidth));
+                        items.Add(new CollectableItem(this, new Transform(new Vector2(280, WindowHeight - 380), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[1], itemsCelWidth));
+                        items.Add(new CollectableItem(this, new Transform(new Vector2(520, WindowHeight - 380), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[2], itemsCelWidth));
+                        items.Add(new CollectableItem(this, new Transform(new Vector2(700, WindowHeight - 460), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[3], itemsCelWidth));
+                        items.Add(new CollectableItem(this, new Transform(new Vector2(395, WindowHeight - 510), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[4], itemsCelWidth));
+                        items.Add(new CollectableItem(this, new Transform(new Vector2(130, WindowHeight - 260), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[5], itemsCelWidth));
+                        items.Add(new CollectableItem(this, new Transform(new Vector2(675, WindowHeight - 260), 0, 1), new Rectangle(0, 0, 48, 83), itemsTexture[6], itemsCelWidth));
+                         
+                        trophy = new CollectableItem(this, new Transform(new Vector2(WindowWidth - 80, WindowHeight - 95), 0, 1), new Rectangle(0, 0, 48, 83), trophyTexture, 68);
+                        trophy.SetState(CollectableItem.ItemState.Hidden);
 
-            foreach (PlatformCollider bound in boundsCollider)
-            {
-                bound.IsCollide(player);
+                        gameState = GameState.PlayGame;
+                    }
+                    break;
+                case GameState.PlayGame:
+                    if (keyboardState.IsKeyDown(Keys.Left))
+                    {
+                        player.MoveLeftRight(-1);
+                    }
+                    else if (keyboardState.IsKeyDown(Keys.Right))
+                    {
+                        player.MoveLeftRight(1);
+                    }
+                    else
+                    {
+                        player.StopMoving();
+                        player.currentState = Player.PlayerState.idle;
+                    }
+                    if (keyboardState.IsKeyDown(Keys.Space))
+                    {
+                        player.Jump();
+                    }
+                    foreach (PlatformCollider bound in boundsCollider)
+                    {
+                        bound.CheckCollision(player);
+                    }
+                    foreach (Platform platform in platforms)
+                    {
+                        platform.IsCollide(player);
+                    }
+                    foreach (CollectableItem item in items)
+                    {
+                        item.CheckItemCollistion(player.RectangleBounds);
+                        item.Update(gameTime);
+                    }
+                    if (items.Where(x => x.GetState() == CollectableItem.ItemState.Collect).Count() == items.Count())
+                    {
+                        if(trophy.GetState() == CollectableItem.ItemState.Hidden)
+                        {
+                            trophy.SetState(CollectableItem.ItemState.NotCollect);
+                        }
+                        trophy.CheckItemCollistion(player.RectangleBounds);
+                        trophy.Update(gameTime);
+                    }
+                    if (items.Where(x => x.GetState() == CollectableItem.ItemState.Collect).Count() == items.Count() && trophy.GetState() == CollectableItem.ItemState.Collect)
+                    {
+                        gameState = GameState.Finish;
+                    }
+                    player.Update(gameTime);
+                    break;
+                case GameState.Finish:
+                    if (keyboardState.IsKeyDown(Keys.Enter))
+                    {
+                        elapsedTime = 0;
+                        countStartTime = 1500;
+                        countStart = 3;
+                        isDrawTrophy = false;
+                        gameState = GameState.MainMenu;
+                    }
+                    break;
+                default:
+                    break;
             }
-            foreach (Platform platform in platforms)
-            {
-                platform.IsCollide(player);
-            }
-            foreach (CollectableItem item in items)
-            {
-                item.CheckItemCollistion(player.RectangleBounds);
-                item.Update(gameTime);
-            }
-
-            player.Update(gameTime);
-
             base.Update(gameTime);
         }
 
@@ -154,38 +214,60 @@ namespace PlatformerGame
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
-            _spriteBatch.Draw(background, new Rectangle(0, 0, WindowWidth, WindowHeight), new Color(Color.White, 1f));
 
-            var timer = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            switch (gameState)
+            {
+                case GameState.MainMenu:
+                    _spriteBatch.Draw(mainmenuBackground, new Rectangle(0, 0, WindowWidth + 90, WindowHeight), Color.White);
+                    _spriteBatch.DrawString(font, "Collect all tetris to win the game", new Vector2(20, WindowHeight / 2 - 90), Color.Violet);
+                    _spriteBatch.DrawString(biggerFont, countStart.ToString(), new Vector2(220, WindowHeight - 300), Color.LightPink);
+                    break;
+                case GameState.PlayGame:
+                    _spriteBatch.Draw(background, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
 
-            remainDelayTime -= timer;
+                    var timer = (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    remainDelayTime -= timer;
 
-            if (remainDelayTime < 0)
-            {
-                redIndensity = random.Next(0, 255);
-                greenIndensity = random.Next(0, 255);
-                blueIndensity = random.Next(0, 255);
-                remainDelayTime = delayTime;
+                    if (remainDelayTime < 0)
+                    {
+                        redIndensity = random.Next(0, 255);
+                        greenIndensity = random.Next(0, 255);
+                        blueIndensity = random.Next(0, 255);
+                        remainDelayTime = delayTime;
+                    }
+                    foreach (Platform platform in platforms)
+                    {
+                        platform.Draw(_spriteBatch, new Color(redIndensity, greenIndensity, blueIndensity));
+                    }
+                    foreach (PlatformCollider bound in boundsCollider)
+                    {
+                        bound.Draw(_spriteBatch, Color.White);
+                    }
+                    foreach (CollectableItem item in items)
+                    {
+                        item.Draw(gameTime);
+                    }
+                    trophy.Draw(gameTime);
+                    player.Draw(gameTime);
+                    break;
+                case GameState.Finish:
+                    _spriteBatch.Draw(finishBackground, new Rectangle(0, 0, WindowWidth, WindowHeight), Color.White);
+                    _spriteBatch.DrawString(font, "Thank you for playing the game!", new Vector2(165, WindowHeight / 2 - 100), Color.LightSeaGreen);
+                    _spriteBatch.DrawString(font, "HAVE A GREAT DAY! :)", new Vector2(250, WindowHeight / 2 + 80), Color.LightSalmon);
+                    _spriteBatch.DrawString(font, "Enter to play again...", new Vector2(265, WindowHeight - 60), Color.MediumVioletRed);
+                    break;
+                default:
+                    break;
             }
-            foreach (Platform platform in platforms)
-            {
-                platform.Draw(_spriteBatch, new Color(redIndensity, greenIndensity, blueIndensity));
-            }
-            
-            foreach (PlatformCollider bound in boundsCollider)
-            {
-                bound.Draw(_spriteBatch, Color.White);
-            }
-            
-            foreach(CollectableItem item in items)
-            {
-                item.Draw(gameTime);
-            }
-            
-            player.Draw(gameTime);
             _spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+        public enum GameState
+        {
+            MainMenu,
+            PlayGame,
+            Finish,
         }
     }
 }

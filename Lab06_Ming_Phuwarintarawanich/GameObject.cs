@@ -37,12 +37,10 @@ namespace PlatformerGame
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-
         }
 
         public override void Draw(GameTime gameTime)
         {
-            //base.Draw(gameTime);
             spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             spriteBatch.Draw(_texture, _transform.Position, _texture.Bounds, Color.White, _transform.Rotation, _texture.Bounds.Center.ToVector2(), _transform.Scale, SpriteEffects.None, 0);
             spriteBatch.End();

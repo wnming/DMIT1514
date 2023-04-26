@@ -19,6 +19,7 @@ namespace PlatformerGame
 
         internal PlayerState currentState = PlayerState.idle;
         PlayerDirection playerDirection = PlayerDirection.right;
+        PlatformerGame.GameState currentGameState = PlatformerGame.GameState.PlayGame;
 
         public Player(Transform transform, Game game, Rectangle rectangle, Texture2D idleTexture, CelAnimationSet animationSet) : base(game, transform, rectangle, idleTexture)
         {
@@ -29,6 +30,7 @@ namespace PlatformerGame
 
         internal void Update(GameTime gameTime)
         {
+            currentGameState = PlatformerGame.gameState;
             _rectangleBounds.Location = _transform.Position.ToPoint();
             velocity.Y += PlatformerGame.Gravity;
             _transform.MovePosition(Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds);
@@ -88,9 +90,12 @@ namespace PlatformerGame
 
         public override void Draw(GameTime gameTime)
         {
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            celPlayer.Draw(spriteBatch, _transform.Position, (SpriteEffects)playerDirection);
-            spriteBatch.End();
+            if(currentGameState != PlatformerGame.GameState.Finish)
+            {
+                spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+                celPlayer.Draw(spriteBatch, _transform.Position, (SpriteEffects)playerDirection);
+                spriteBatch.End();
+            }
         }
 
         internal enum PlayerState

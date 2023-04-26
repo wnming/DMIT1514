@@ -14,57 +14,51 @@ namespace PlatformerGame
         protected Vector2 position;
         protected Vector2 dimensions;
 
-        protected PlatformCollider left;
-        protected PlatformCollider right;
-        protected PlatformCollider top;
-        protected PlatformCollider bottom;
+        protected List<PlatformCollider> platformColliders = new();
 
         public Platform(Vector2 position, Vector2 dimensions)
         {
-            left = new PlatformCollider(
-                                    PlatformCollider.PlatformColliderType.Left,
-                                    new Vector2(position.X, position.Y + 3),
-                                    new Vector2(10, dimensions.Y + 5)
-                                    );
-            right = new PlatformCollider(
-                                    PlatformCollider.PlatformColliderType.Right,
-                                    new Vector2(position.X + dimensions.X - 9, position.Y + 3),
-                                    new Vector2(10, dimensions.Y + 5)
-                                    );
-            top = new PlatformCollider(
-                                    PlatformCollider.PlatformColliderType.Top,
-                                    new Vector2(position.X + 3, position.Y),
-                                    new Vector2(dimensions.X - 6, 10)
-                                    );
-            bottom = new PlatformCollider(
-                                    PlatformCollider.PlatformColliderType.Bottom,
-                                    new Vector2(position.X + 4, position.Y + dimensions.Y),
-                                    new Vector2(dimensions.X - 6, 10)
-                                    );
+            platformColliders.Add(new PlatformCollider(
+                            PlatformCollider.PlatformColliderType.Left,
+                            new Vector2(position.X, position.Y + 3),
+                            new Vector2(10, dimensions.Y + 5)));
+            platformColliders.Add(new PlatformCollider(
+                            PlatformCollider.PlatformColliderType.Right,
+                            new Vector2(position.X + dimensions.X - 9, position.Y + 3),
+                            new Vector2(10, dimensions.Y + 5)));
+            platformColliders.Add(new PlatformCollider(
+                            PlatformCollider.PlatformColliderType.Top,
+                            new Vector2(position.X + 3, position.Y),
+                            new Vector2(dimensions.X - 6, 10)));
+            platformColliders.Add(new PlatformCollider(
+                            PlatformCollider.PlatformColliderType.Bottom,
+                            new Vector2(position.X + 4, position.Y + dimensions.Y),
+                            new Vector2(dimensions.X - 6, 10)
+                            ));
         }
 
         internal void LoadContent(ContentManager Content)
         {
-            left.LoadContent(Content);
-            right.LoadContent(Content);
-            top.LoadContent(Content);
-            bottom.LoadContent(Content);
+            platformColliders[(int)PlatformCollider.PlatformColliderType.Left].LoadContent(Content);
+            platformColliders[(int)PlatformCollider.PlatformColliderType.Right].LoadContent(Content);
+            platformColliders[(int)PlatformCollider.PlatformColliderType.Top].LoadContent(Content);
+            platformColliders[(int)PlatformCollider.PlatformColliderType.Bottom].LoadContent(Content);
         }
 
         internal void IsCollide(Player player)
         {
-            left.IsCollide(player);
-            right.IsCollide(player);
-            top.IsCollide(player);
-            bottom.IsCollide(player);
+            for(int index = 0; index < platformColliders.Count; index++)
+            {
+                platformColliders[index].CheckCollision(player);
+            }
         }
 
         internal void Draw(SpriteBatch spriteBatch, Color color)
         {
-            left.Draw(spriteBatch, color);
-            right.Draw(spriteBatch, color);
-            top.Draw(spriteBatch, color);
-            bottom.Draw(spriteBatch, color);
+            for (int index = 0; index < platformColliders.Count; index++)
+            {
+                platformColliders[index].Draw(spriteBatch, color);
+            }
         }
     }
 }

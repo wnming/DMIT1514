@@ -1,24 +1,39 @@
 ﻿using Microsoft.Xna.Framework;
+using MonoGameExtensions;
 using System;
 
 namespace PlatformerGame
 {
     public struct Transform
     {
-        public Vector2 _position;
-        public float _rotation;
-        public float _scale;
+        Vector2 _position;
+        float _rotation;
+        int _scale;
 
-        public Transform(Vector2 position, float rotation, float scale)
+        public Vector2 Position => _position;
+        public float Rotation => _rotation;
+        public int Scale => _scale;
+        public Point Location(Point referenceSize) => _position.Location(referenceSize);
+
+        public Transform(Vector2 position, float rotation, int scale)
         {
             _position = position;
             _rotation = rotation;
             _scale = scale;
+
         }
 
         public void SetPosition(Vector2 newPosition)
         {
             _position = newPosition;
+        }
+        public void SetPosition(float x, float y)
+        {
+            _position = new Vector2(x, y);
+        }
+        public void SetPosition(Rectangle rect)
+        {
+            _position = rect.Center.ToVector2();
         }
 
         public Vector2 MovePosition(Vector2 posOffset)
@@ -27,22 +42,5 @@ namespace PlatformerGame
             return _position + posOffset;
         }
 
-        public void PointTowards(Vector2 target)
-        {
-            Vector2 dir = (target - _position);
-            dir.Normalize();
-            _rotation = (float)Math.Atan2((double)dir.Y, (double)dir.X) + MathHelper.PiOver2;
-        }
-
-        public void SetScale(float newScale)
-        {
-            _scale = newScale;
-        }
-
-
-        public Point ToPoint()
-        {
-            return new Point((int)_position.X, (int)_position.Y);
-        }
     }
 }

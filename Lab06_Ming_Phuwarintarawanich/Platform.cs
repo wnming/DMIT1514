@@ -11,7 +11,6 @@ namespace PlatformerGame
 {
     public class Platform
     {
-        protected Texture2D texture;
         protected Vector2 position;
         protected Vector2 dimensions;
 
@@ -24,23 +23,23 @@ namespace PlatformerGame
         {
             left = new PlatformCollider(
                                     PlatformCollider.PlatformColliderType.Left,
-                                    new Vector2(position.X + 3, position.Y),
-                                    new Vector2(dimensions.X - 6, 1)
+                                    new Vector2(position.X, position.Y + 3),
+                                    new Vector2(10, dimensions.Y + 5)
                                     );
             right = new PlatformCollider(
                                     PlatformCollider.PlatformColliderType.Right,
-                                    new Vector2(position.X + dimensions.X - 1, position.Y + 1),
-                                    new Vector2(1, dimensions.Y - 2)
+                                    new Vector2(position.X + dimensions.X - 9, position.Y + 3),
+                                    new Vector2(10, dimensions.Y + 5)
                                     );
             top = new PlatformCollider(
                                     PlatformCollider.PlatformColliderType.Top,
-                                    new Vector2(position.X + 3, position.Y + dimensions.Y),
-                                    new Vector2(dimensions.X - 6, 1)
+                                    new Vector2(position.X + 3, position.Y),
+                                    new Vector2(dimensions.X - 6, 10)
                                     );
             bottom = new PlatformCollider(
                                     PlatformCollider.PlatformColliderType.Bottom,
-                                    new Vector2(position.X, position.Y + 1),
-                                    new Vector2(1, dimensions.Y - 2)
+                                    new Vector2(position.X + 4, position.Y + dimensions.Y),
+                                    new Vector2(dimensions.X - 6, 10)
                                     );
         }
 
@@ -52,20 +51,20 @@ namespace PlatformerGame
             bottom.LoadContent(Content);
         }
 
-        internal void ProcessCollisions(Player player)
+        internal void IsCollide(Player player)
         {
-            left.ProcessCollisions(player);
-            right.ProcessCollisions(player);
-            top.ProcessCollisions(player);
-            bottom.ProcessCollisions(player);
+            left.IsCollide(player);
+            right.IsCollide(player);
+            top.IsCollide(player);
+            bottom.IsCollide(player);
         }
 
-        internal void Draw(SpriteBatch spriteBatch)
+        internal void Draw(SpriteBatch spriteBatch, Color color)
         {
-            left.Draw(spriteBatch);
-            right.Draw(spriteBatch);
-            top.Draw(spriteBatch);
-            bottom.Draw(spriteBatch);
+            left.Draw(spriteBatch, color);
+            right.Draw(spriteBatch, color);
+            top.Draw(spriteBatch, color);
+            bottom.Draw(spriteBatch, color);
         }
     }
 }

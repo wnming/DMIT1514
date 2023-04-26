@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace PlatformerGame
@@ -22,24 +21,17 @@ namespace PlatformerGame
         // Calculated count of cels in the sequence
         protected int celCount;
 
-        private int celRow;
-        private int celColumn;
-
         /// <summary>
         /// Constructs a new CelAnimationSequence.
         /// </summary>        
-        public CelAnimationSequence(Texture2D texture, int celHeight, int celWidth, float celTime, int celCount, int celRow)
+        public CelAnimationSequence(Texture2D texture, int celWidth, float celTime)
         {
             this.texture = texture;
             this.celWidth = celWidth;
             this.celTime = celTime;
 
-            //get value from parameter except for the celColumn
-            this.celHeight = celHeight;
-            //celCount needs to be passed because there are 5 frames with 2 rows if we use celColumn(3) * celRow(2) = 6, and there will be a gap when playing
-            this.celCount = celCount;
-            this.celColumn = Texture.Width / celWidth;
-            this.celRow = celRow;
+            celHeight = Texture.Height;
+            celCount = Texture.Width / celWidth;
         }
 
         /// <summary>
@@ -80,23 +72,6 @@ namespace PlatformerGame
         public int CelHeight
         {
             get { return celHeight; }
-        }
-
-        /// <summary>
-        /// Gets the row of a frame in the animation.
-        /// </summary>
-        public int CelRow
-        {
-            get { return celRow; }
-        }
-
-
-        /// <summary>
-        /// Gets the column of a frame in the animation.
-        /// </summary>
-        public int CelColumn
-        {
-            get { return celColumn; }
         }
     }
 }

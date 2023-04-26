@@ -32,38 +32,34 @@ namespace PlatformerGame
 
         internal void LoadContent(ContentManager Content)
         {
-            colliderTexture = Content.Load<Texture2D>(colliderType.ToString());
+            colliderTexture = Content.Load<Texture2D>("platform");
         }
-        internal void Draw(SpriteBatch spriteBatch)
+        internal void Draw(SpriteBatch spriteBatch, Color color)
         {
-            spriteBatch.Draw(colliderTexture, BoundingBox, new Rectangle(0, 0, 1, 1), Color.White);
+            spriteBatch.Draw(colliderTexture, BoundingBox, new Rectangle(0, 0, 1, 1), color);
         }
 
-        internal bool ProcessCollisions(Player player)
+        internal void IsCollide(Player player)
         {
-            bool didCollide = false;
-            if (BoundingBox.Intersects(player.BoundingBox))
+            if (BoundingBox.Intersects(player.RectangleBounds))
             {
-                didCollide = true;
                 switch (colliderType)
                 {
                     case PlatformColliderType.Left:
-                        //if the player is moving rightwards
                         if (player.Velocity.X > 0)
                         {
                             player.MoveLeftRight(0);
                         }
                         break;
                     case PlatformColliderType.Right:
-                        //if the player is moving leftwards
                         if (player.Velocity.X < 0)
                         {
                             player.MoveLeftRight(0);
                         }
                         break;
                     case PlatformColliderType.Top:
-                        player.Land(BoundingBox);
-                        player.StandOn(BoundingBox);
+                        player.Ground(BoundingBox);
+                        player.Stand();
                         break;
                     case PlatformColliderType.Bottom:
                         if (player.Velocity.Y < 0)
@@ -73,8 +69,6 @@ namespace PlatformerGame
                         break;
                 }
             }
-
-            return didCollide;
         }
 
         public enum PlatformColliderType

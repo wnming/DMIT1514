@@ -1,165 +1,108 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using PlatformerGame;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PlatformerGame
 {
-    public class Player
+    internal class Player : GameObject
     {
-        protected Vector2 position;
-        protected Vector2 dimensions;
-        protected Rectangle gameArea;
-
         protected Vector2 velocity;
         internal Vector2 Velocity { get => velocity; }
 
-        private const int PlayerJumpForce = -300;
-        private const int PlayerSpeed = 150;
+        private const int PlayerJumpForce = -200;
+        private const int PlayerSpeed = 120;
 
-        private Texture2D walkingManTexture;
-        Dictionary<string, Rectangle[]> walkingManRectangle = new Dictionary<string, Rectangle[]>();
-        private const int SpriteColumn = 4;
-        private float timeElapsed = 0.0f;
-        private float timeToUpdate = 1 / 8.0f;
+        CelAnimationPlayer celPlayer;
+        CelAnimationSet animationSet;
 
-        private PlayerState currentState = PlayerState.left;
-        private int frame = 1;
+        internal PlayerState currentState = PlayerState.idle;
+        PlayerDirection playerDirection = PlayerDirection.right;
 
-        internal Rectangle BoundingBox
+        public Player(Transform transform, Game game, Rectangle rectangle, Texture2D idleTexture, CelAnimationSet animationSet) : base(game, transform, rectangle, idleTexture)
         {
-            get
-            {
-                return new Rectangle((int)position.X, (int)position.Y, (int)dimensions.X, (int)dimensions.Y);
-            }
-        }
-
-        public Player(Vector2 position, Rectangle gameArea)
-        {
-            this.position = position;
-            this.gameArea = gameArea;
-            this.dimensions = new Vector2(46, 40);
-        }
-
-        internal void LoadContent(ContentManager Content)
-        {
-            walkingManTexture = Content.Load<Texture2D>("walking_man");
-
-            walkingManRectangle["right"] = new Rectangle[4] { new Rectangle(0, 458, 102, 153), new Rectangle(102, 458, 102, 153), new Rectangle(204, 458, 102, 153), new Rectangle(306, 458, 102, 153) };
-            walkingManRectangle["left"] = new Rectangle[4] { new Rectangle(0, 305, 102, 153), new Rectangle(102, 305, 102, 153), new Rectangle(204, 305, 102, 153), new Rectangle(306, 305, 102, 153) };
-            walkingManRectangle["up"] = new Rectangle[4] { new Rectangle(0, 0, 102, 153), new Rectangle(102, 0, 102, 153), new Rectangle(204, 0, 102, 153), new Rectangle(306, 0, 102, 153) };
+            this.animationSet = animationSet;
+            celPlayer = new CelAnimationPlayer();
+            celPlayer.Play(animationSet.Idle);
         }
 
         internal void Update(GameTime gameTime)
         {
-            timeElapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
+            _rectangleBounds.Location = _transform.Position.ToPoint();
             velocity.Y += PlatformerGame.Gravity;
-
-            position += velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            _transform.MovePosition(Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds);
 
             if (Math.Abs(velocity.Y) > PlatformerGame.Gravity)
             {
-                currentState = PlayerState.up;
+                currentState = PlayerState.jump;
+                celPlayer.Play(animationSet.Jump);
             }
 
-            switch (currentState)
-            {
-                case PlayerState.left:
-                    break;
-                case PlayerState.right:
-                    break;
-                case PlayerState.up:
-                    break;
-                default:
-                    break;
-            }
+            playerDirection = velocity.X < 0 ? PlayerDirection.right : PlayerDirection.left;
+            celPlayer.Update(gameTime);
         }
 
         internal void MoveLeftRight(float direction)
         {
-            float oldXDirection = velocity.X;
             velocity.X = direction * PlayerSpeed;
-
-            if (timeElapsed > timeToUpdate)
+            if (currentState != PlayerState.jump)
             {
-                timeElapsed -= timeToUpdate;
-
-                if (velocity.X > 0)
-                {
-                    frame++;
-                    if (frame == SpriteColumn)
-                    {
-                        frame = 0;
-                    }
-                    currentState = PlayerState.right;
-                }
-                else if (velocity.X < 0)
-                {
-                    frame++;
-                    if (frame == SpriteColumn)
-                    {
-                        frame = 0;
-                    }
-                    currentState = PlayerState.left;
-                }
+                celPlayer.Play(animationSet.Run);
+                currentState = PlayerState.walk;
             }
-            //if (state != State.Jumping)
-            //{
-            //    animationPlayer.Play(walkSequence);
-            //    state = State.Walking;
-            //}
         }
+
         internal void MoveUpDown(float direction)
         {
             velocity.Y = direction * PlayerSpeed;
         }
 
-        internal void Land(Rectangle whatILandedOn)
+        internal void Ground(Rectangle collider)
         {
-            if (currentState == PlayerState.up)
+            if (velocity.Y > 0)
             {
-                position.Y = whatILandedOn.Top - dimensions.Y + 1;
+                _transform.SetPosition(_transform.Position.X, collider.Top - _rectangleBounds.Height + 1);
                 velocity.Y = 0;
+                currentState = PlayerState.walk;
             }
         }
-        internal void StandOn(Rectangle whatImStandingOn)
+        internal void Stand()
         {
             velocity.Y -= PlatformerGame.Gravity;
         }
-        internal void Stop()
+
+        internal void StopMoving()
         {
-            if (currentState != PlayerState.up)
+            if (currentState == PlayerState.walk)
             {
                 velocity = Vector2.Zero;
+                currentState = PlayerState.idle;
+                celPlayer.Play(animationSet.Idle);
             }
-            //if (state == State.Walking)
-            //{
-            //    velocity = Vector2.Zero;
-            //    state = State.Idle;
-            //    animationPlayer.Play(idleSequence);
-            //}
         }
         internal void Jump()
         {
-            velocity.Y = currentState == PlayerState.up ? PlayerJumpForce : 0;
+            velocity.Y = currentState != PlayerState.jump ? PlayerJumpForce : 0;
         }
 
-        internal void Draw(SpriteBatch _spriteBatch)
+        public override void Draw(GameTime gameTime)
         {
-            _spriteBatch.Draw(walkingManTexture, position, walkingManRectangle[currentState.ToString()][frame], Color.White);
+            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            celPlayer.Draw(spriteBatch, _transform.Position, (SpriteEffects)playerDirection);
+            spriteBatch.End();
         }
 
-        protected enum PlayerState
+        internal enum PlayerState
+        {
+            idle,
+            walk,
+            jump
+        }
+        internal enum PlayerDirection
         {
             left,
-            right,
-            up
+            right
         }
     }
 }

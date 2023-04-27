@@ -26,11 +26,10 @@ namespace PlatformerGame
         CelAnimationSet animationSet;
         List<Texture2D> playerTexture = new();
 
-        protected PlatformCollider groundCollider;
-        protected PlatformCollider topCollider;
-        protected PlatformCollider leftCollider;
-        protected PlatformCollider rightCollider;
-        protected List<PlatformCollider> boundsCollider = new();
+        protected ColliderLeft leftCollider;
+        protected ColliderRight rightCollider;
+        protected ColliderTop topCollider;
+        protected ColliderBottom bottomCollider;
         protected List<Platform> platforms = new();
 
         List<Texture2D> itemsTexture = new();
@@ -40,7 +39,6 @@ namespace PlatformerGame
 
         Texture2D trophyTexture;
         CollectableItem trophy;
-        bool isDrawTrophy = false;
 
         private Random random = new Random();
         int redIndensity = 255, greenIndensity = 255, blueIndensity = 255;
@@ -64,10 +62,10 @@ namespace PlatformerGame
 
         protected override void Initialize()
         {
-            boundsCollider.Add(new PlatformCollider(PlatformCollider.PlatformColliderType.Right, new Vector2(0, 0), new Vector2(5, WindowHeight)));
-            boundsCollider.Add(new PlatformCollider(PlatformCollider.PlatformColliderType.Left, new Vector2(WindowWidth - 5, 0), new Vector2(5, WindowHeight)));
-            boundsCollider.Add(new PlatformCollider(PlatformCollider.PlatformColliderType.Top, new Vector2(0, WindowHeight - 5), new Vector2(WindowWidth, 5)));
-            boundsCollider.Add(new PlatformCollider(PlatformCollider.PlatformColliderType.Bottom, new Vector2(0, 0), new Vector2(WindowWidth, 5)));
+            rightCollider = new ColliderRight(new Vector2(0, 0), new Vector2(5, WindowHeight));
+            leftCollider = new ColliderLeft(new Vector2(WindowWidth - 5, 0), new Vector2(5, WindowHeight));
+            topCollider = new ColliderTop(new Vector2(0, WindowHeight - 5), new Vector2(WindowWidth, 5));
+            bottomCollider = new ColliderBottom(new Vector2(0, 0), new Vector2(WindowWidth, 5));
             platforms.Add(new Platform(new Vector2(80, WindowHeight - 400), new Vector2(100, 25)));
             platforms.Add(new Platform(new Vector2(250, WindowHeight - 320), new Vector2(100, 25)));
             platforms.Add(new Platform(new Vector2(490, WindowHeight - 320), new Vector2(100, 25)));
@@ -95,10 +93,11 @@ namespace PlatformerGame
             mainmenuBackground = Content.Load<Texture2D>("mainmenu-bg");
             finishBackground = Content.Load<Texture2D>("finish-bg");
 
-            foreach (PlatformCollider bound in boundsCollider)
-            {
-                bound.LoadContent(Content);
-            }
+            rightCollider.LoadContent(Content);
+            leftCollider.LoadContent(Content);
+            topCollider.LoadContent(Content);
+            bottomCollider.LoadContent(Content);
+
             foreach (Platform platform in platforms)
             {
                 platform.LoadContent(Content);
@@ -165,10 +164,10 @@ namespace PlatformerGame
                     {
                         player.Jump();
                     }
-                    foreach (PlatformCollider bound in boundsCollider)
-                    {
-                        bound.CheckCollision(player);
-                    }
+                    rightCollider.CheckCollision(player);
+                    leftCollider.CheckCollision(player);
+                    topCollider.CheckCollision(player);
+                    bottomCollider.CheckCollision(player);
                     foreach (Platform platform in platforms)
                     {
                         platform.IsCollide(player);
@@ -199,7 +198,6 @@ namespace PlatformerGame
                         elapsedTime = 0;
                         countStartTime = 1500;
                         countStart = 3;
-                        isDrawTrophy = false;
                         gameState = GameState.MainMenu;
                     }
                     break;
@@ -239,10 +237,10 @@ namespace PlatformerGame
                     {
                         platform.Draw(_spriteBatch, new Color(redIndensity, greenIndensity, blueIndensity));
                     }
-                    foreach (PlatformCollider bound in boundsCollider)
-                    {
-                        bound.Draw(_spriteBatch, Color.White);
-                    }
+                    rightCollider.Draw(_spriteBatch, Color.White);
+                    leftCollider.Draw(_spriteBatch, Color.White);
+                    topCollider.Draw(_spriteBatch, Color.White);
+                    bottomCollider.Draw(_spriteBatch, Color.White);
                     foreach (CollectableItem item in items)
                     {
                         item.Draw(gameTime);
